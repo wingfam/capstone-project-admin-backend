@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient.DataClassification;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
 
 namespace MailBoxTest.Controllers
 {
@@ -31,13 +32,13 @@ namespace MailBoxTest.Controllers
         }
 
         [HttpPost(template: "add-admin")]
-        public String AddAdmin(string phone, string email, string password, string name)
+        public String AddAdmin(string username, string password)
         {
             try
             {
                 client = new FireSharp.FirebaseClient(config);
                 //Creating pushing object and put in var
-                Admin r = new Admin(RandomString(8), email, password, name, phone);
+                Admin r = new Admin(RandomString(8), username, password);
                 var data = r;
 
 
@@ -60,8 +61,8 @@ namespace MailBoxTest.Controllers
             }
         }
 
-        [HttpGet(template:"verify-login")]
-        public string VerifyLogin(string email, string password)
+        [HttpPost(template:"verify-login")]
+        public ActionResult VerifyLogin(string email, string password)
         {
             try
             {
@@ -70,7 +71,7 @@ namespace MailBoxTest.Controllers
                 FirebaseResponse response = client.Get("Admin");
                 dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
 
-                var Admin = new Admin();
+                var admin = new Admin();
 
                 int result = 0;
                 if(data != null)
@@ -80,39 +81,50 @@ namespace MailBoxTest.Controllers
                         var value = JsonConvert.DeserializeObject<Admin>(((JProperty)item).Value.ToJson());
                         var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
                         var r = JsonConvert.DeserializeObject<Admin>(jvalue);
-                        if (r.admin_email.ToLower() == email.ToLower())
+                        if (r.username.ToLower() == email.ToLower())
                         {
-                            if (r.admin_password.ToLower() ==  password.ToLower())
+                            if (r.password.ToLower() ==  password.ToLower())
                             {
-                                result = 1; //Account valid
-                            } else
-                            {
-                                result = 2; //Incorrect Password
-                            }
+                                result = 0; //Account valid
+                                admin = r; 
+                                break;
+                            } 
                         } else
                         {
-                            result = 3; //Account invalid
+                            result = 1; //Account invalid
                         }
                     }
                 } else {
-                    result = 4; //Null data
+                    result = 2; //Null data
                 }
+                string msg = "";
+
 
                 switch (result)
                 {
+                    case 0:
+                        msg = "Login Success";
+                        break;
                     case 1:
-                        return "Login Success";
+                        msg = "Incorrect Password";
+                        break;
                     case 2:
-                        return "Incorrect Password";
-                    case 3:
-                        return "Invalid Email";
-                    case 4:
-                        return "No data found";
+                        msg = "Invalid Email";
+                        break;
                 }
-                return null;
+
+                var resultJson = new {LoginStatus = result, Message = msg, admin};
+                //0: Success 
+                //1: Incorrect Password or Username
+                //2: No data found
+                //Return object {LoginStatus: (number),
+                //               Message: (),
+                //               Object: User,
+                //              }
+                return Content(JsonConvert.SerializeObject(resultJson, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None }), "application/json");
             }catch (Exception ex)
             {
-                return ex.ToString();
+                return Content(ex.ToString());
             }
         }
     }
