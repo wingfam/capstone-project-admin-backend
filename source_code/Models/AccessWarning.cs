@@ -15,6 +15,7 @@ public partial class AccessWarning
     public DateTime? CreateDate { get; set; }
 
     public string? LockerId { get; set; }
+    public string? Status { get; set; }
 
     [JsonIgnore]
     public virtual Locker? Locker { get; set; }
