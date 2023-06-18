@@ -28,7 +28,7 @@ namespace MailBoxTest.Controllers
                 .Select(s => s[random.Next(s.Length)]).ToArray());
         }
 
-        [HttpGet(template:"get-residents")]
+        [HttpGet(template:"get-all")]
         public ActionResult GetResudents()
         {
             client = new FireSharp.FirebaseClient(config);
@@ -49,13 +49,13 @@ namespace MailBoxTest.Controllers
             return Content(json, "application/json");
         }
 
-        [HttpGet(template: "search-resident")]
+        [HttpGet(template: "search")]
         public ActionResult GetUser(string residentId)
         {
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get("Resident");
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
-            var list = new List<Resident>();
+            var result = new Resident();
             if (data != null)
             {
                 foreach (var item in data)
@@ -63,14 +63,14 @@ namespace MailBoxTest.Controllers
                     var value = JsonConvert.DeserializeObject<Resident>(((JProperty)item).Value.ToJson());
                     var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
                     var r = JsonConvert.DeserializeObject<Resident>(jvalue);
-                    if (r.ResidentId.ToUpper() == residentId.ToUpper())
+                    if (r.residentId.ToUpper() == residentId.ToUpper())
                     {
-                        list.Add(r);
+                        result = r;
                     }
                 }
             }
 
-            var json = JsonConvert.SerializeObject(list, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+            var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
 
             //Json convert
             return Content(json, "application/json");
@@ -87,8 +87,8 @@ namespace MailBoxTest.Controllers
                 var data = r;
 
                 PushResponse response = client.Push("Resident/", data);
-                data.Id = response.Result.name;
-                SetResponse setResponse = client.Set("Resident/" + data.Id, data);
+                data.id = response.Result.name;
+                SetResponse setResponse = client.Set("Resident/" + data.id, data);
 
                 if (setResponse.StatusCode == System.Net.HttpStatusCode.OK)
                 {
@@ -105,12 +105,13 @@ namespace MailBoxTest.Controllers
             }
         }
 
-        [HttpPut(template:"Edit-resident-profile")]
-        public async Task<string> UpdateResident (string res_id, string phone, string fullname)
+        [HttpPut(template:"edit-resident")]
+        public async Task<string> UpdateResident (string resident_id, string phone, string fullname, bool isAvailable)
         {
             try
             {
-                FirebaseResponse response = client.Get("Resident");
+                client = new FireSharp.FirebaseClient(config);
+                FirebaseResponse response = client.Get("Resident/");
                 dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
 
                 var resident = new Resident();
@@ -121,17 +122,23 @@ namespace MailBoxTest.Controllers
                         var value = JsonConvert.DeserializeObject<Resident>(((JProperty)item).Value.ToJson());
                         var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
                         var r = JsonConvert.DeserializeObject<Resident>(jvalue);
-                        if (r.ResidentId.ToUpper() == res_id.ToUpper())
+                        if (r.residentId.ToUpper() == resident_id.ToUpper())
                         {
                             resident = r;
                         }
                     }
                 }
+                if(phone != "")
+                {
+                    resident.phone = phone;
+                }
+                if(fullname != "")
+                {
+                    resident.fullname = fullname;
+                }
+                resident.isAvaiable = isAvailable;
 
-                resident.Phone = phone;
-                resident.Fullname = fullname;
-
-                response = await client.UpdateAsync("Resident/" + resident.Id, resident);
+                response = await client.UpdateAsync("Resident/" + resident.id, resident);
             } catch (Exception ex)
             {
                 return ex.ToString();
@@ -139,8 +146,8 @@ namespace MailBoxTest.Controllers
             return "Edit Successful";
         }
 
-        [HttpDelete(template: "delete-resident")]
-        public async Task<string> DeleteResidentAsync(string id)
+        [HttpDelete(template: "delete")]
+        public async Task<string> DeleteResidentAsync(string resident_id)
         {
             client = new FireSharp.FirebaseClient(config);
 
@@ -157,14 +164,14 @@ namespace MailBoxTest.Controllers
                         var value = JsonConvert.DeserializeObject<Resident>(((JProperty)item).Value.ToJson());
                         var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
                         var r = JsonConvert.DeserializeObject<Resident>(jvalue);
-                        if (r.ResidentId.ToUpper() == id.ToUpper())
+                        if (r.residentId.ToUpper() == resident_id.ToUpper())
                         {
                             resident = r;
                         }
                     }
                 }
-                resident.IsAvaiable = false; //Delede = Change status to false
-                response = await client.UpdateAsync("Resident/" + resident.Id, resident);
+                resident.isAvaiable = false; //Delede = Change status to false
+                response = await client.UpdateAsync("Resident/" + resident.id, resident);
 
                 return "Delete Successful";
             } catch (Exception ex)

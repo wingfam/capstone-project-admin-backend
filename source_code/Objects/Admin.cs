@@ -13,7 +13,7 @@
             this.password = password;
         }
        
-        public string? ID { get; set; }
+        public string? id { get; set; }
         public string? admin_id { get; set; }
         public string? username { get; set; }
         public string? password { get; set; }

@@ -7,19 +7,19 @@ namespace MailBoxTest.Models;
 
 public partial class BookingOrder
 {
-    public string Id { get; set; } = null!;
+    public string id { get; set; } = null!;
 
-    public string BookingOrderId { get; set; } = null!;
+    public string bookingOrderId { get; set; } = null!;
 
-    public DateTime? BookingDate { get; set; }
+    public DateTime? bookingDate { get; set; }
 
-    public DateTime? BookingValidDate { get; set; }
+    public DateTime? bookingValidDate { get; set; }
 
-    public bool? BookingStatus { get; set; }
+    public bool? bookingStatus { get; set; }
 
-    public string? ResidentId { get; set; }
+    public string? residentId { get; set; }
 
-    public string? LockerId { get; set; }
+    public string? lockerId { get; set; }
 
     [JsonIgnore]
     [IgnoreDataMember]
