@@ -12,26 +12,26 @@ public partial class Resident
     }
 
     public Resident(string residentId, string phone, string email, string password, string fullname, bool isAvaiable) {
-        this.ResidentId = residentId;
-        this.Phone = phone;
-        this.Email = email;
-        this.PasswordHash = password;
-        this.Fullname = fullname;
-        this.IsAvaiable = isAvaiable;
+        this.residentId = residentId;
+        this.phone = phone;
+        this.email = email;
+        this.password = password;
+        this.fullname = fullname;
+        this.isAvaiable = isAvaiable;
     }
-    public string Id { get; set; } = null!;
+    public string id { get; set; } = null!;
 
-    public string ResidentId { get; set; } = null!;
+    public string residentId { get; set; } = null!;
 
-    public string Phone { get; set; } = null!;
+    public string phone { get; set; } = null!;
 
-    public string? Email { get; set; }
+    public string? email { get; set; }
 
-    public string? PasswordHash { get; set; }
+    public string? password { get; set; }
 
-    public string? Fullname { get; set; }
+    public string? fullname { get; set; }
 
-    public bool? IsAvaiable { get; set; }
+    public bool? isAvaiable { get; set; }
 
     [JsonIgnore]
     [IgnoreDataMember]

@@ -7,17 +7,17 @@ namespace MailBoxTest.Models;
 
 public partial class PackageInfo
 {
-    public string Id { get; set; } = null!;
+    public string id { get; set; } = null!;
 
-    public string PackageInfoId { get; set; } = null!;
+    public string packageInfoId { get; set; } = null!;
 
-    public DateTime? DeliveryDate { get; set; }
+    public DateTime? deliveryDate { get; set; }
 
-    public DateTime? PickupDate { get; set; }
+    public DateTime? pickupDate { get; set; }
 
-    public string? ResidentId { get; set; }
+    public string? residentId { get; set; }
 
-    public string? LockerId { get; set; }
+    public string? lockerId { get; set; }
 
     [JsonIgnore]
     public virtual Locker? Locker { get; set; }
