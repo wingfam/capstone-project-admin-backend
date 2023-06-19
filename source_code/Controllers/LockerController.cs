@@ -9,6 +9,12 @@ using Newtonsoft.Json.Linq;
 
 namespace DeliverBox_BE.Controllers
 {
+    //Locker status:
+    //0: Deleted, not avaiable
+    //1: On Stand by
+    //2: In use
+    //3: Maintenance
+
     [Route("api/v1/locker")]
     [ApiController]
     public class LockerController : Controller
@@ -75,14 +81,14 @@ namespace DeliverBox_BE.Controllers
         }
 
         [HttpPost(template:"add-locker")]
-        public String AddLocker (string locker_name, bool locker_status, string unlock_code)
+        public String AddLocker (string locker_name, int locker_status)
         {
-            DateTime validDate = new DateTime();
+            DateTime validDate = DateTime.Now;
             try
             {
                 client = new FireSharp.FirebaseClient(config);
 
-                Locker l = new Locker(RandomString(8).ToUpper(), locker_name, locker_status, unlock_code, validDate);
+                Locker l = new Locker(RandomString(8).ToUpper(), locker_name, locker_status, null, validDate);
                 var data = l;
 
                 PushResponse response = client.Push("Locker/", data);
@@ -99,6 +105,42 @@ namespace DeliverBox_BE.Controllers
             } catch (Exception ex)
             {
                 return ex.ToString();
+            }
+        }
+
+        [HttpPut(template:"edit")]
+        public async Task<string> EditLocker (string locker_id, string locker_name, int locker_status, string unlock_code)
+        {
+            client = new FireSharp.FirebaseClient(config);
+            FirebaseResponse response = client.Get("Locker/");
+            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+
+            try
+            {
+                var locker = new Locker();
+                if (data != null)
+                {
+                    foreach (var item in data)
+                    {
+                        var value = JsonConvert.DeserializeObject<Locker>(((JProperty)item).Value.ToJson());
+                        var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                        var l = JsonConvert.DeserializeObject<Locker>(jvalue);
+                        if (l.lockerId.ToUpper() == locker_id.ToUpper())
+                        {
+                            locker = l;
+                        }
+                    }
+                }
+                locker.lockerName = locker_name;
+                locker.lockerStatus = locker_status;
+                locker.unlockCode = unlock_code;
+
+                response = await client.UpdateAsync("Locker/" + locker.lockerId, locker);
+
+                return "Edit Success";
+            } catch (Exception ex)
+            {
+                return ex.Message;
             }
         }
 
@@ -126,7 +168,7 @@ namespace DeliverBox_BE.Controllers
                         }
                     }
                 }
-                locker.lockerStatus = false; //Delede = Change status to false
+                locker.lockerStatus = 0; //Delede = Change status to 0
                 response = await client.UpdateAsync("Locker/" + locker.id, locker);
 
                 return "Delete Successful";
