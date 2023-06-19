@@ -106,7 +106,7 @@ namespace MailBoxTest.Controllers
         }
 
         [HttpPut(template:"edit-resident")]
-        public async Task<string> UpdateResident (string resident_id, string phone, string fullname, bool isAvailable)
+        public async Task<string> UpdateResident (string residentId, bool isAvailable)
         {
             try
             {
@@ -122,19 +122,11 @@ namespace MailBoxTest.Controllers
                         var value = JsonConvert.DeserializeObject<Resident>(((JProperty)item).Value.ToJson());
                         var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
                         var r = JsonConvert.DeserializeObject<Resident>(jvalue);
-                        if (r.residentId.ToUpper() == resident_id.ToUpper())
+                        if (r.residentId.ToUpper() == residentId.ToUpper())
                         {
                             resident = r;
                         }
                     }
-                }
-                if(phone != "")
-                {
-                    resident.phone = phone;
-                }
-                if(fullname != "")
-                {
-                    resident.fullname = fullname;
                 }
                 resident.isAvaiable = isAvailable;
 
@@ -147,7 +139,7 @@ namespace MailBoxTest.Controllers
         }
 
         [HttpDelete(template: "delete")]
-        public async Task<string> DeleteResidentAsync(string resident_id)
+        public async Task<string> DeleteResidentAsync(string residentId)
         {
             client = new FireSharp.FirebaseClient(config);
 
@@ -164,7 +156,7 @@ namespace MailBoxTest.Controllers
                         var value = JsonConvert.DeserializeObject<Resident>(((JProperty)item).Value.ToJson());
                         var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
                         var r = JsonConvert.DeserializeObject<Resident>(jvalue);
-                        if (r.residentId.ToUpper() == resident_id.ToUpper())
+                        if (r.residentId.ToUpper() == residentId.ToUpper())
                         {
                             resident = r;
                         }
