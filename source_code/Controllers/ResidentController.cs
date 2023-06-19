@@ -77,7 +77,7 @@ namespace MailBoxTest.Controllers
         }
 
         [HttpPost(template:"add-resident")]
-        public String AddResident(string phone, string email, string password, string fullname)
+        public int AddResident(string phone, string email, string password, string fullname)
         {
             try
             {
@@ -92,21 +92,21 @@ namespace MailBoxTest.Controllers
 
                 if (setResponse.StatusCode == System.Net.HttpStatusCode.OK)
                 {
-                    return "Add successfully";
+                    return 1;
                 }
                 else
                 {
-                    return "Something went wrong";
+                    return 0;
                 }
             }
             catch (Exception ex)
             {
-                return ex.ToString();
+                return 0;
             }
         }
 
         [HttpPut(template:"edit-resident")]
-        public async Task<string> UpdateResident (string residentId, bool isAvailable)
+        public async Task<int> UpdateResident (string residentId, bool isAvailable)
         {
             try
             {
@@ -131,15 +131,15 @@ namespace MailBoxTest.Controllers
                 resident.isAvaiable = isAvailable;
 
                 response = await client.UpdateAsync("Resident/" + resident.id, resident);
+                return 1;
             } catch (Exception ex)
             {
-                return ex.ToString();
+                return 0;
             }
-            return "Edit Successful";
         }
 
         [HttpDelete(template: "delete")]
-        public async Task<string> DeleteResidentAsync(string residentId)
+        public async Task<int> DeleteResidentAsync(string residentId)
         {
             client = new FireSharp.FirebaseClient(config);
 
@@ -165,10 +165,10 @@ namespace MailBoxTest.Controllers
                 resident.isAvaiable = false; //Delede = Change status to false
                 response = await client.UpdateAsync("Resident/" + resident.id, resident);
 
-                return "Delete Successful";
+                return 1;
             } catch (Exception ex)
             {
-                return ex.ToString();
+                return 0;
             }
         }
     }
