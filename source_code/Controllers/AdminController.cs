@@ -123,7 +123,6 @@ namespace MailBoxTest.Controllers
                         {
                             result = 2; //Wrong username
                             admin = null;
-                            break;
                         }
                     }
                 } else {

@@ -1,4 +1,5 @@
-﻿using FireSharp.Config;
+﻿using DeliverBox_BE.Models;
+using FireSharp.Config;
 using FireSharp.Extensions;
 using FireSharp.Interfaces;
 using FireSharp.Response;
@@ -81,14 +82,14 @@ namespace DeliverBox_BE.Controllers
         }
 
         [HttpPost(template:"add-locker")]
-        public String AddLocker (string locker_name, int locker_status)
+        public String AddLocker([FromBody] LockerModel model)
         {
             DateTime validDate = DateTime.Now;
             try
             {
                 client = new FireSharp.FirebaseClient(config);
 
-                Locker l = new Locker(RandomString(8).ToUpper(), locker_name, locker_status, null, validDate);
+                Locker l = new Locker(RandomString(8).ToUpper(), model.lockerName, model.lockerStatus, null, validDate);
                 var data = l;
 
                 PushResponse response = client.Push("Locker/", data);
