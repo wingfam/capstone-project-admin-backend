@@ -10,12 +10,6 @@ using Newtonsoft.Json.Linq;
 
 namespace DeliverBox_BE.Controllers
 {
-    //Locker status:
-    //0: Deleted, not avaiable
-    //1: On Stand by
-    //2: In use
-    //3: Maintenance
-
     [Route("api/v1/locker")]
     [ApiController]
     public class LockerController : Controller
@@ -136,7 +130,7 @@ namespace DeliverBox_BE.Controllers
                 locker.lockerStatus = locker_status;
                 locker.unlockCode = unlock_code;
 
-                response = await client.UpdateAsync("Locker/" + locker.lockerId, locker);
+                response = await client.UpdateAsync("Locker/" + locker.id, locker);
 
                 return 1;
             } catch (Exception ex)
