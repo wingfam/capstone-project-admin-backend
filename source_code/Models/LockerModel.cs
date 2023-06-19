@@ -3,6 +3,6 @@
     public class LockerModel
     {
         public string lockerName { get; set; }
-        public int lockerStatus { get; set; }
+        public bool lockerStatus { get; set; }
     }
 }

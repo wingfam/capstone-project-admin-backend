@@ -82,7 +82,7 @@ namespace DeliverBox_BE.Controllers
         }
 
         [HttpPost(template:"add-locker")]
-        public String AddLocker([FromBody] LockerModel model)
+        public int AddLocker([FromBody] LockerModel model)
         {
             DateTime validDate = DateTime.Now;
             try
@@ -98,19 +98,19 @@ namespace DeliverBox_BE.Controllers
                 
                 if(setResponse.StatusCode == System.Net.HttpStatusCode.OK)
                 {
-                    return "Add successfully";
+                    return 1;
                 } else
                 {
-                    return "Something went wrong";
+                    return 0;
                 }
             } catch (Exception ex)
             {
-                return ex.ToString();
+                return 0;
             }
         }
 
         [HttpPut(template:"edit")]
-        public async Task<string> EditLocker (string locker_id, string locker_name, int locker_status, string unlock_code)
+        public async Task<int> EditLocker (string locker_id, string locker_name, bool locker_status, string unlock_code)
         {
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get("Locker/");
@@ -138,15 +138,15 @@ namespace DeliverBox_BE.Controllers
 
                 response = await client.UpdateAsync("Locker/" + locker.lockerId, locker);
 
-                return "Edit Success";
+                return 1;
             } catch (Exception ex)
             {
-                return ex.Message;
+                return 0;
             }
         }
 
         [HttpDelete(template: "delete")]
-        public async Task<string> DeleteLockerAsync(string locker_id)
+        public async Task<int> DeleteLockerAsync(string locker_id)
         {
             client = new FireSharp.FirebaseClient(config);
 
@@ -169,14 +169,14 @@ namespace DeliverBox_BE.Controllers
                         }
                     }
                 }
-                locker.lockerStatus = 0; //Delede = Change status to 0
+                locker.lockerStatus = false; //Delede = Change status to 0
                 response = await client.UpdateAsync("Locker/" + locker.id, locker);
 
-                return "Delete Successful";
+                return 1;
             }
             catch (Exception ex)
             {
-                return ex.ToString();
+                return 0;
             }
         }
     }
