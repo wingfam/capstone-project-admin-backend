@@ -104,7 +104,7 @@ namespace DeliverBox_BE.Controllers
         }
 
         [HttpPut(template:"edit")]
-        public async Task<int> EditLocker (string locker_id, string locker_name, bool locker_status, string unlock_code)
+        public async Task<int> EditLocker ([FromBody] LockerModel model)
         {
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get("Locker/");
@@ -120,20 +120,54 @@ namespace DeliverBox_BE.Controllers
                         var value = JsonConvert.DeserializeObject<Locker>(((JProperty)item).Value.ToJson());
                         var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
                         var l = JsonConvert.DeserializeObject<Locker>(jvalue);
-                        if (l.lockerId.ToUpper() == locker_id.ToUpper())
+                        if (l.lockerId.ToUpper() == model.lockerId.ToUpper())
                         {
                             locker = l;
                         }
                     }
                 }
-                locker.lockerName = locker_name;
-                locker.lockerStatus = locker_status;
-                locker.unlockCode = unlock_code;
+                locker.lockerName = model.lockerName;
+                locker.lockerStatus = model.lockerStatus;
 
                 response = await client.UpdateAsync("Locker/" + locker.id, locker);
 
                 return 1;
             } catch (Exception ex)
+            {
+                return 0;
+            }
+        }
+
+        [HttpPut(template: "change-unlock-code")]
+        public async Task<int> ChangeUnlockCode([FromBody] LockerModel model)
+        {
+            client = new FireSharp.FirebaseClient(config);
+            FirebaseResponse response = client.Get("Locker/");
+            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+
+            try
+            {
+                var locker = new Locker();
+                if (data != null)
+                {
+                    foreach (var item in data)
+                    {
+                        var value = JsonConvert.DeserializeObject<Locker>(((JProperty)item).Value.ToJson());
+                        var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                        var l = JsonConvert.DeserializeObject<Locker>(jvalue);
+                        if (l.lockerId.ToUpper() == model.lockerId.ToUpper())
+                        {
+                            locker = l;
+                        }
+                    }
+                }
+                locker.unlockCode = model.unlockCode;
+
+                response = await client.UpdateAsync("Locker/" + locker.id, locker);
+
+                return 1;
+            }
+            catch (Exception ex)
             {
                 return 0;
             }
