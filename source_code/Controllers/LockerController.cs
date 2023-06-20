@@ -76,7 +76,7 @@ namespace DeliverBox_BE.Controllers
         }
 
         [HttpPost(template:"add-locker")]
-        public int AddLocker([FromBody] LockerModel model)
+        public int AddLocker([FromBody] LockerAddModel model)
         {
             DateTime validDate = DateTime.Now;
             try
@@ -104,7 +104,7 @@ namespace DeliverBox_BE.Controllers
         }
 
         [HttpPut(template:"edit")]
-        public async Task<int> EditLocker ([FromBody] LockerModel model)
+        public async Task<int> EditLocker ([FromBody] LockerEditModel model)
         {
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get("Locker/");
@@ -139,7 +139,7 @@ namespace DeliverBox_BE.Controllers
         }
 
         [HttpPut(template: "change-unlock-code")]
-        public async Task<int> ChangeUnlockCode([FromBody] LockerModel model)
+        public async Task<int> ChangeUnlockCode([FromBody] LockerChangeCodeModel model)
         {
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get("Locker/");
