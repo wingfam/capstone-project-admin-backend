@@ -1,4 +1,5 @@
-﻿using FireSharp.Config;
+﻿using DeliverBox_BE.Models;
+using FireSharp.Config;
 using FireSharp.Extensions;
 using FireSharp.Interfaces;
 using FireSharp.Response;
@@ -77,36 +78,34 @@ namespace MailBoxTest.Controllers
         }
 
         [HttpPost(template:"add-resident")]
-        public int AddResident(string phone, string email, string password, string fullname)
+        public ActionResult AddResident([FromBody]ResidentAddModel model)
         {
             try
             {
                 client = new FireSharp.FirebaseClient(config);
-                //Creating pushing object and put in var
-                Resident r = new Resident(RandomString(8).ToUpper(), phone, email, password, fullname, true);
+                //Creating pushing object and put in var 
+                Resident r = new Resident(RandomString(8).ToUpper(), model.phone, model.email, model.password, model.fullname, true);
                 var data = r;
 
                 PushResponse response = client.Push("Resident/", data);
                 data.id = response.Result.name;
                 SetResponse setResponse = client.Set("Resident/" + data.id, data);
 
-                if (setResponse.StatusCode == System.Net.HttpStatusCode.OK)
-                {
-                    return 1;
-                }
-                else
-                {
-                    return 0;
-                }
+                var result = new { errCode = 0, errMessage = "Success" };
+                var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+
+                return Content(json, "application/json");
             }
             catch (Exception ex)
             {
-                return 0;
+                var result = new { errCode = 1, errMessage = ex.Message };
+                var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                return Content(json, "application/json");
             }
         }
 
-        [HttpPut(template:"edit-resident")]
-        public async Task<int> UpdateResident (string residentId, bool isAvailable)
+        [HttpPut(template:"update")]
+        public async Task<ActionResult> UpdateResident (string residentId, [FromBody]ResidentUpdateModel model)
         {
             try
             {
@@ -128,18 +127,24 @@ namespace MailBoxTest.Controllers
                         }
                     }
                 }
-                resident.isAvaiable = isAvailable;
+                resident.isAvaiable = model.isAvaiable;
 
                 response = await client.UpdateAsync("Resident/" + resident.id, resident);
-                return 1;
+
+                var result = new { errCode = 0, errMessage = "Success" };
+                var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+
+                return Content(json, "application/json");
             } catch (Exception ex)
             {
-                return 0;
+                var result = new { errCode = 1, errMessage = ex.Message };
+                var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                return Content(json, "application/json");
             }
         }
 
         [HttpDelete(template: "delete")]
-        public async Task<int> DeleteResidentAsync(string residentId)
+        public async Task<ActionResult> DeleteResidentAsync(string residentId)
         {
             client = new FireSharp.FirebaseClient(config);
 
@@ -165,10 +170,14 @@ namespace MailBoxTest.Controllers
                 resident.isAvaiable = false; //Delede = Change status to false
                 response = await client.UpdateAsync("Resident/" + resident.id, resident);
 
-                return 1;
+                var result = new { errCode = 0, errMessage = "Success" };
+                var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                return Content(json, "application/json");
             } catch (Exception ex)
             {
-                return 0;
+                var result = new { errCode = 1, errMessage = ex.Message };
+                var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                return Content(json, "application/json");
             }
         }
     }
