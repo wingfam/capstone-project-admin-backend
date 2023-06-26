@@ -11,8 +11,7 @@ public partial class Resident
     {
     }
 
-    public Resident(string residentId, string phone, string email, string password, string fullname, bool isAvaiable) {
-        this.residentId = residentId;
+    public Resident( string phone, string email, string password, string fullname, bool isAvaiable) {
         this.phone = phone;
         this.email = email;
         this.password = password;
@@ -20,8 +19,6 @@ public partial class Resident
         this.isAvaiable = isAvaiable;
     }
     public string id { get; set; } = null!;
-
-    public string residentId { get; set; } = null!;
 
     public string phone { get; set; } = null!;
 

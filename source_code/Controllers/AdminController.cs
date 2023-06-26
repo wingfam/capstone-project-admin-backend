@@ -21,14 +21,6 @@ namespace MailBoxTest.Controllers
         };
         IFirebaseClient client;
 
-        private static Random random = new Random(); //Random 8 characer gen
-        public static string RandomString(int length)
-        {
-            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-            return new string(Enumerable.Repeat(chars, length)
-                .Select(s => s[random.Next(s.Length)]).ToArray());
-        }
-
         //public static string EncodePasswordToBase64(string password)
         //{
         //    try
@@ -57,15 +49,14 @@ namespace MailBoxTest.Controllers
         //}
 
         [HttpPost(template: "add-admin")]
-        public String AddAdmin(string username, string password)
+        public String AddAdmin([FromBody] AdminAddModel model)
         {
             try
             {
                 client = new FireSharp.FirebaseClient(config);
                 //Creating pushing object and put in var
-                Admin r = new Admin(RandomString(8), username, password);
+                Admin r = new Admin(model.username, model.password);
                 var data = r;
-
 
                 PushResponse response = client.Push("Admin/", data);
                 data.id = response.Result.name;

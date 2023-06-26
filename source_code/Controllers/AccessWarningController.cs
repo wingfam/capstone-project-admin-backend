@@ -5,6 +5,7 @@ using MailBoxTest.Models;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
+using DeliverBox_BE.Models;
 
 namespace DeliverBox_BE.Controllers
 {
@@ -17,14 +18,6 @@ namespace DeliverBox_BE.Controllers
             BasePath = "https://slsd-capstone-project-default-rtdb.asia-southeast1.firebasedatabase.app/"
         };
         IFirebaseClient client;
-
-        private static Random random = new Random(); //Random 8 characer gen
-        public static string RandomString(int length)
-        {
-            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-            return new string(Enumerable.Repeat(chars, length)
-                .Select(s => s[random.Next(s.Length)]).ToArray());
-        }
 
         [HttpGet(template: "get-all")]
         public ActionResult GetAllWarning()
@@ -47,12 +40,15 @@ namespace DeliverBox_BE.Controllers
         }
 
         [HttpPost(template:"add-warning")]
-        public String AddWarning (string message, string locker_id, string status)
+        public String AddWarning ([FromBody] AccessWarningAddModel model)
         {
             DateTime createdDate = DateTime.Now;
             try
             {
-                 
+                client = new FireSharp.FirebaseClient(config);
+
+                AccessWarning a = new AccessWarning(model.message, model.lockerId, model.status, createdDate);
+                
             } catch (Exception ex) { 
                 
             }
