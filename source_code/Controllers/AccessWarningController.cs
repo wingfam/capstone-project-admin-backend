@@ -19,14 +19,6 @@ namespace DeliverBox_BE.Controllers
         };
         IFirebaseClient client;
 
-        private static Random random = new Random(); //Random 8 characer gen
-        public static string RandomString(int length)
-        {
-            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-            return new string(Enumerable.Repeat(chars, length)
-                .Select(s => s[random.Next(s.Length)]).ToArray());
-        }
-
         [HttpGet(template: "get-all")]
         public ActionResult GetAllWarning()
         {
