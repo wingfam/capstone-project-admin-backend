@@ -50,7 +50,7 @@ namespace DeliverBox_BE.Controllers
         }
 
         [HttpGet(template: "search")]
-        public ActionResult GetLocker(string lockerId)
+        public ActionResult GetLocker(string id)
         {
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get("Locker");
@@ -64,13 +64,12 @@ namespace DeliverBox_BE.Controllers
                     var value = JsonConvert.DeserializeObject<Locker>(((JProperty)item).Value.ToJson());
                     var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
                     var l = JsonConvert.DeserializeObject<Locker>(jvalue);
-                    if (l.lockerId.ToUpper() == lockerId.ToUpper())
+                    if (l.id == id)
                     {
                         result = l;
                     }
                 }
             }
-
             var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
             return Content(json, "application/json");
         }
@@ -84,7 +83,7 @@ namespace DeliverBox_BE.Controllers
                 client = new FireSharp.FirebaseClient(config);
                 FirebaseResponse response = client.Get("Locker");
 
-                Locker l = new Locker(RandomString(8).ToUpper(), model.lockerName, model.lockerStatus, null, validDate);
+                Locker l = new Locker(model.lockerName, model.lockerStatus, null, validDate);
                 var input = l;
 
                 dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
@@ -119,7 +118,7 @@ namespace DeliverBox_BE.Controllers
         }
 
         [HttpPut(template:"edit")]
-        public async Task<ActionResult> EditLocker (string lockerId, [FromBody] LockerEditModel model)
+        public async Task<ActionResult> EditLocker (string id, [FromBody] LockerEditModel model)
         {
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get("Locker/");
@@ -135,7 +134,7 @@ namespace DeliverBox_BE.Controllers
                         var value = JsonConvert.DeserializeObject<Locker>(((JProperty)item).Value.ToJson());
                         var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
                         var l = JsonConvert.DeserializeObject<Locker>(jvalue);
-                        if (l.lockerId.ToUpper() == lockerId.ToUpper())
+                        if (l.id == id)
                         {
                             locker = l;
                         }
@@ -175,7 +174,7 @@ namespace DeliverBox_BE.Controllers
                         var value = JsonConvert.DeserializeObject<Locker>(((JProperty)item).Value.ToJson());
                         var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
                         var l = JsonConvert.DeserializeObject<Locker>(jvalue);
-                        if (l.lockerId.ToUpper() == model.lockerId.ToUpper())
+                        if (l.id == model.id)
                         {
                             locker = l;
                         }
@@ -198,7 +197,7 @@ namespace DeliverBox_BE.Controllers
         }
 
         [HttpDelete(template: "delete")]
-        public async Task<ActionResult> DeleteLockerAsync(string lockerId)
+        public async Task<ActionResult> DeleteLockerAsync(string id)
         {
             client = new FireSharp.FirebaseClient(config);
 
@@ -215,7 +214,7 @@ namespace DeliverBox_BE.Controllers
                         var value = JsonConvert.DeserializeObject<Locker>(((JProperty)item).Value.ToJson());
                         var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
                         var l = JsonConvert.DeserializeObject<Locker>(jvalue);
-                        if (l.lockerId.ToUpper() == lockerId.ToUpper())
+                        if (l.id == id)
                         {
                             locker = l;
                         }

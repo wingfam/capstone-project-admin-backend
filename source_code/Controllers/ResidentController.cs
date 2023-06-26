@@ -51,7 +51,7 @@ namespace MailBoxTest.Controllers
         }
 
         [HttpGet(template: "search")]
-        public ActionResult GetUser(string residentId)
+        public ActionResult GetUser(string id)
         {
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get("Resident");
@@ -64,7 +64,7 @@ namespace MailBoxTest.Controllers
                     var value = JsonConvert.DeserializeObject<Resident>(((JProperty)item).Value.ToJson());
                     var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
                     var r = JsonConvert.DeserializeObject<Resident>(jvalue);
-                    if (r.residentId.ToUpper() == residentId.ToUpper())
+                    if (r.id == id)
                     {
                         result = r;
                     }
@@ -84,7 +84,7 @@ namespace MailBoxTest.Controllers
             {
                 client = new FireSharp.FirebaseClient(config);
                 //Creating pushing object and put in var 
-                Resident r = new Resident(RandomString(8).ToUpper(), model.phone, model.email, model.password, model.fullname, true);
+                Resident r = new Resident(model.phone, model.email, model.password, model.fullname, true);
                 var data = r;
 
                 PushResponse response = client.Push("Resident/", data);
@@ -105,7 +105,7 @@ namespace MailBoxTest.Controllers
         }
 
         [HttpPut(template:"update")]
-        public async Task<ActionResult> UpdateResident (string residentId, [FromBody]ResidentUpdateModel model)
+        public async Task<ActionResult> UpdateResident (string id, [FromBody]ResidentUpdateModel model)
         {
             try
             {
@@ -121,7 +121,7 @@ namespace MailBoxTest.Controllers
                         var value = JsonConvert.DeserializeObject<Resident>(((JProperty)item).Value.ToJson());
                         var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
                         var r = JsonConvert.DeserializeObject<Resident>(jvalue);
-                        if (r.residentId.ToUpper() == residentId.ToUpper())
+                        if (r.id == id)
                         {
                             resident = r;
                         }
@@ -144,7 +144,7 @@ namespace MailBoxTest.Controllers
         }
 
         [HttpDelete(template: "delete")]
-        public async Task<ActionResult> DeleteResidentAsync(string residentId)
+        public async Task<ActionResult> DeleteResidentAsync(string id)
         {
             client = new FireSharp.FirebaseClient(config);
 
@@ -161,7 +161,7 @@ namespace MailBoxTest.Controllers
                         var value = JsonConvert.DeserializeObject<Resident>(((JProperty)item).Value.ToJson());
                         var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
                         var r = JsonConvert.DeserializeObject<Resident>(jvalue);
-                        if (r.residentId.ToUpper() == residentId.ToUpper())
+                        if (r.id == id)
                         {
                             resident = r;
                         }

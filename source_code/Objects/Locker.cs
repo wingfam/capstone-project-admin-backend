@@ -11,9 +11,8 @@ public partial class Locker
     {
     }
 
-    public Locker(string locker_id ,string locker_name, bool locker_status, string unlock_code, DateTime validDate)
+    public Locker(string locker_name, bool locker_status, string unlock_code, DateTime validDate)
     {
-        this.lockerId = locker_id;
         this.lockerName = locker_name;
         this.lockerStatus = locker_status;
         this.unlockCode = unlock_code;
@@ -21,8 +20,6 @@ public partial class Locker
     }
 
     public string id { get; set; } = null!;
-
-    public string lockerId { get; set; } = null!;
 
     public string lockerName { get; set; } = null!;
 

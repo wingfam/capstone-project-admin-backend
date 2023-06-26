@@ -6,9 +6,15 @@ namespace MailBoxTest.Models;
 
 public partial class AccessWarning
 {
-    public string id { get; set; } = null!;
+    public AccessWarning(string message, string lockerId, string status, DateTime createdDate)
+    {
+        this.message = message;
+        this.lockerId = lockerId;
+        this.status = status;
+        this.createDate = createdDate;
+    }
 
-    public string accessWarningId { get; set; } = null!;
+    public string id { get; set; } = null!;
 
     public string? message { get; set; }
 
