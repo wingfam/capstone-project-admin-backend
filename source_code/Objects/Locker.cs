@@ -19,12 +19,6 @@ public partial class Locker
         this.validDate = validDate;
     }
 
-    public Locker(string lockerName, bool lockerStatus, object value, string[] strings)
-    {
-        this.lockerName = lockerName;
-        this.lockerStatus = lockerStatus;
-    }
-
     public string id { get; set; } = null!;
 
     public string lockerName { get; set; } = null!;
