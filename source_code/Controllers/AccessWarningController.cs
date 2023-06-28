@@ -39,20 +39,29 @@ namespace DeliverBox_BE.Controllers
             return Content(json, "application/json");
         }
 
-        [HttpPost(template:"add-warning")]
-        public String AddWarning ([FromBody] AccessWarningAddModel model)
+        [HttpPost(template: "add-warning")]
+        public ActionResult AddWarning([FromBody] AccessWarningAddModel model)
         {
-            DateTime createdDate = DateTime.Now;
+            DateTime createDate = DateTime.Now;
             try
             {
                 client = new FireSharp.FirebaseClient(config);
 
-                AccessWarning a = new AccessWarning(model.message, model.lockerId, model.status, createdDate);
-                
-            } catch (Exception ex) { 
-                
+                var aw = new AccessWarning(model.message, model.lockerId, model.status, createDate);
+
+                PushResponse pushResponse = client.Push("AccessWarning/", aw);
+                aw.id = pushResponse.Result.name;
+                SetResponse setResponse = client.Set("AccessWarning/" + aw.id, aw);
+
+                var result = new { errCode = 0, errMessage = "Success" };
+                var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                return Content(json, "application/json");
+            } catch (Exception ex)
+            {
+                var result = new { errCode = 1, errMessage = ex.Message };
+                var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                return Content(json, "application/json");
             }
-            return "Add Succesfully";
         }
     }
 }
