@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace MailBoxTest.Models;
+namespace DeliverBox_BE.Models;
 
 public partial class BookingHistory
 {

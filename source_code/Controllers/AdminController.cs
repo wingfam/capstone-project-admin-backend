@@ -3,7 +3,6 @@ using FireSharp.Config;
 using FireSharp.Extensions;
 using FireSharp.Interfaces;
 using FireSharp.Response;
-using MailBoxTest.Models;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;

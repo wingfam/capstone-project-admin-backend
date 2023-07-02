@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
 
-namespace MailBoxTest.Models;
+namespace DeliverBox_BE.Models;
 
 public partial class PackageInfo
 {
@@ -20,7 +20,7 @@ public partial class PackageInfo
     public string? lockerId { get; set; }
 
     [JsonIgnore]
-    public virtual Locker? Locker { get; set; }
+    public virtual Box? Locker { get; set; }
     [JsonIgnore]
     public virtual Resident? Resident { get; set; }
 }

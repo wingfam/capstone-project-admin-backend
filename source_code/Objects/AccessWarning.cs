@@ -3,10 +3,14 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
 
-namespace MailBoxTest.Models;
+namespace DeliverBox_BE.Models;
 
 public partial class AccessWarning
 {
+    public AccessWarning()
+    {
+    }
+
     public AccessWarning(string message, string lockerId, bool status, DateTime createdDate)
     {
         this.message = message;
@@ -26,5 +30,5 @@ public partial class AccessWarning
 
     [JsonIgnore]
     [IgnoreDataMember]
-    public virtual Locker? Locker { get; set; }
+    public virtual Box? Locker { get; set; }
 }
