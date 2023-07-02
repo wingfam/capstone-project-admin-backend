@@ -11,6 +11,7 @@ using FireSharp.Extensions;
 namespace DeliverLocation_BE.Controllers
 {
     [Route("api/v1/location")]
+    [ApiController]
     public class LocationController : Controller
     {
         IFirebaseConfig config = new FirebaseConfig

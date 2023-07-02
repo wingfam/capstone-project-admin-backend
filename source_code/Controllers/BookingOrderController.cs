@@ -9,7 +9,7 @@ using Newtonsoft.Json.Linq;
 
 namespace DeliverBox_BE.Controllers
 {
-    [Route("api/v1/bookingOrder")]
+    [Microsoft.AspNetCore.Components.Route("api/v1/bookingOrder")]
     [ApiController]
     public class BookingOrderController : Controller
     {
@@ -39,9 +39,5 @@ namespace DeliverBox_BE.Controllers
             var json = JsonConvert.SerializeObject(list, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
             return Content(json, "application/json");
         }
-
-        [HttpPost(template:"add-booking-order")]
-        public ActionResult AddBookingOrder ()
-
     }
 }

@@ -9,7 +9,7 @@ using Newtonsoft.Json.Linq;
 
 namespace MailBoxTest.Controllers
 {
-    [Route("api/v1/home")]
+    [Route("api/v1/resident")]
     [ApiController]
     public class ResidentController : Controller
     {

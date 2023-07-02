@@ -10,6 +10,7 @@ using FireSharp.Extensions;
 namespace DeliverBox_BE.Controllers
 {
     [Route("api/v1/warning")]
+    [ApiController]
     public class AccessWarningController : Controller
     {
         IFirebaseConfig config = new FirebaseConfig

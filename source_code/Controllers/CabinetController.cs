@@ -12,6 +12,7 @@ using DeliverBox_BE.Models;
 namespace DeliverCabinet_BE.Controllers
 {
     [Route("api/v1/Cabinet")]
+    [ApiController]
     public class CabinetController : Controller
     {
         IFirebaseConfig config = new FirebaseConfig
