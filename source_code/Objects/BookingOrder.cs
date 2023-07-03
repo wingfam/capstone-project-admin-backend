@@ -3,23 +3,21 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
 
-namespace DeliverBox_BE.Models;
+namespace DeliverBox_BE.Objects;
 
 public partial class BookingOrder
 {
     public string id { get; set; } = null!;
 
-    public string bookingOrderId { get; set; } = null!;
+    public DateTime? createDate { get; set; }
 
-    public DateTime? bookingDate { get; set; }
+    public DateTime? ValidDate { get; set; }
 
-    public DateTime? bookingValidDate { get; set; }
-
-    public bool? bookingStatus { get; set; }
+    public bool? status { get; set; }
 
     public string? residentId { get; set; }
 
-    public string? lockerId { get; set; }
+    public string? cabinetId { get; set; }
 
     [JsonIgnore]
     [IgnoreDataMember]
