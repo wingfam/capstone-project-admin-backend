@@ -1,4 +1,4 @@
-﻿namespace MailBoxTest.Models
+﻿namespace DeliverBox_BE.Models
 {
     public class Admin
     {

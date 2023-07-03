@@ -1,15 +1,16 @@
 ﻿using FireSharp.Config;
 using FireSharp.Interfaces;
 using FireSharp.Response;
-using MailBoxTest.Models;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using DeliverBox_BE.Models;
+using FireSharp.Extensions;
 
 namespace DeliverBox_BE.Controllers
 {
     [Route("api/v1/warning")]
+    [ApiController]
     public class AccessWarningController : Controller
     {
         IFirebaseConfig config = new FirebaseConfig
@@ -57,6 +58,46 @@ namespace DeliverBox_BE.Controllers
                 var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
                 return Content(json, "application/json");
             } catch (Exception ex)
+            {
+                var result = new { errCode = 1, errMessage = ex.Message };
+                var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                return Content(json, "application/json");
+            }
+        }
+
+        [HttpPut(template: "change-read-status")]
+        public async Task<ActionResult> ChangeReadStatus(string id)
+        {
+            client = new FireSharp.FirebaseClient(config);
+            FirebaseResponse response = client.Get("AccessWarning/");
+            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+
+            try
+            {
+                var accessWarning = new AccessWarning();
+                if (data != null)
+                {
+                    foreach (var item in data)
+                    {
+                        var value = JsonConvert.DeserializeObject<AccessWarning>(((JProperty)item).Value.ToJson());
+                        var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                        var aw = JsonConvert.DeserializeObject<AccessWarning>(jvalue);
+                        if (aw.id == id)
+                        {
+                            accessWarning = aw;
+                        }
+                    }
+                }
+                accessWarning.status = false;
+
+                response = await client.UpdateAsync("AccessWarning/" + accessWarning.id, accessWarning);
+
+                var result = new { errCode = 0, errMessage = "Success" };
+                var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+
+                return Content(json, "application/json");
+            }
+            catch (Exception ex)
             {
                 var result = new { errCode = 1, errMessage = ex.Message };
                 var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });

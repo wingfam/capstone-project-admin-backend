@@ -3,31 +3,30 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
 
-namespace MailBoxTest.Models;
+namespace DeliverBox_BE.Models;
 
-public partial class Locker
+public partial class Box
 {
-    public Locker()
+    public Box()
     {
     }
 
-    public Locker(string locker_name, bool locker_status, string unlock_code, DateTime validDate)
+    public Box(string name, string size, bool isStore, bool isAvaiable, string cabinetId)
     {
-        this.lockerName = locker_name;
-        this.lockerStatus = locker_status;
-        this.unlockCode = unlock_code;
-        this.validDate = validDate;
+        this.name = name;
+        this.size = size;
+        this.isStore = isStore;
+        this.isAvaiable = isAvaiable;
+        this.cabinetId = cabinetId;
     }
 
     public string id { get; set; } = null!;
 
-    public string lockerName { get; set; } = null!;
-
-    public bool? lockerStatus { get; set; }
-
-    public string? unlockCode { get; set; }
-
-    public DateTime? validDate { get; set; }
+    public string name { get; set; } = null!;
+    public string? size { get; set; }
+    public bool? isStore { get; set; }
+    public bool? isAvaiable { get; set; }
+    public string? cabinetId { get; set; }
 
     [JsonIgnore]
     [IgnoreDataMember]

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
 
-namespace MailBoxTest.Models;
+namespace DeliverBox_BE.Objects;
 
 public partial class Resident
 {
@@ -11,12 +11,14 @@ public partial class Resident
     {
     }
 
-    public Resident( string phone, string email, string password, string fullname, bool isAvaiable) {
+    public Resident(string phone, string email, string password, string fullname, bool isAvaiable, string locationId)
+    {
         this.phone = phone;
         this.email = email;
         this.password = password;
         this.fullname = fullname;
         this.isAvaiable = isAvaiable;
+        this.locationId = locationId;
     }
     public string id { get; set; } = null!;
 
@@ -27,7 +29,7 @@ public partial class Resident
     public string? password { get; set; }
 
     public string? fullname { get; set; }
-
+    public string? locationId { get; set; }
     public bool? isAvaiable { get; set; }
 
     [JsonIgnore]
