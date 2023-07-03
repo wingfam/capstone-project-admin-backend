@@ -1,15 +1,14 @@
-﻿using DeliverBox_BE.Models;
+﻿using DeliverBox_BE.Objects;
 using FireSharp.Config;
 using FireSharp.Interfaces;
 using FireSharp.Response;
-using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace DeliverBox_BE.Controllers
 {
-    [Microsoft.AspNetCore.Components.Route("api/v1/bookingOrder")]
+    [Route("api/v1/bookingOrder")]
     [ApiController]
     public class BookingOrderController : Controller
     {

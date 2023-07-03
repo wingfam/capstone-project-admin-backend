@@ -1,4 +1,5 @@
 ﻿using DeliverBox_BE.Models;
+using DeliverBox_BE.Objects;
 using FireSharp.Config;
 using FireSharp.Extensions;
 using FireSharp.Interfaces;
@@ -21,7 +22,7 @@ namespace MailBoxTest.Controllers
         IFirebaseClient client;
 
         [HttpGet(template:"get-all")]
-        public ActionResult GetResudents()
+        public ActionResult GetResidents()
         {
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get("Resident");

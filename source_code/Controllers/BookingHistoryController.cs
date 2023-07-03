@@ -5,9 +5,12 @@ using FireSharp.Response;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
+using FireSharp.Extensions;
 
 namespace DeliverBox_BE.Controllers
 {
+    [Route("api/v1/history")]
+    [ApiController]
     public class BookingHistoryController : Controller
     {
         IFirebaseConfig config = new FirebaseConfig
