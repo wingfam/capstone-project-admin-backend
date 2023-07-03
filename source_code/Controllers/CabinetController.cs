@@ -103,7 +103,7 @@ namespace DeliverCabinet_BE.Controllers
             {
                 client = new FireSharp.FirebaseClient(config);
 
-                var c = new Cabinet(createDate, model.locationId, model.isAvaiable);
+                var c = new Cabinet(model.name, createDate, model.locationId, model.isAvaiable);
 
                 PushResponse pushResponse = client.Push("Cabinet/", c);
                 c.id = pushResponse.Result.name;
@@ -144,6 +144,7 @@ namespace DeliverCabinet_BE.Controllers
                         }
                     }
                 }
+                cabinet.name = model.name;
                 cabinet.locationId = model.locationId;
                 cabinet.isAvaiable = model.isAvaiable;
 

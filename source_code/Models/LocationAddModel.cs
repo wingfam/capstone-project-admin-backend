@@ -1,4 +1,4 @@
-﻿namespace DeliverBox_BE.Models
+﻿namespace DeliverBox_BE.Objects
 {
     public class LocationAddModel
     {

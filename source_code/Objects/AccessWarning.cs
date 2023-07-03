@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
 
-namespace DeliverBox_BE.Models;
+namespace DeliverBox_BE.Objects;
 
 public partial class AccessWarning
 {
