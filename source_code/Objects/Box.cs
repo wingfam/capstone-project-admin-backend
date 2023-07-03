@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
 
-namespace DeliverBox_BE.Models;
+namespace DeliverBox_BE.Objects;
 
 public partial class Box
 {
@@ -28,13 +28,4 @@ public partial class Box
     public bool? isAvaiable { get; set; }
     public string? cabinetId { get; set; }
 
-    [JsonIgnore]
-    [IgnoreDataMember]
-    public virtual ICollection<AccessWarning> AccessWarnings { get; set; } = new List<AccessWarning>();
-    [JsonIgnore]
-    [IgnoreDataMember]
-    public virtual ICollection<BookingOrder> BookingOrders { get; set; } = new List<BookingOrder>();
-    [JsonIgnore]
-    [IgnoreDataMember]
-    public virtual ICollection<PackageInfo> PackageInfos { get; set; } = new List<PackageInfo>();
 }
