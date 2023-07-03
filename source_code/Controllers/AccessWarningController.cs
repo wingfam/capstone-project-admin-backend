@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using DeliverBox_BE.Models;
+using DeliverBox_BE.Objects;
 using FireSharp.Extensions;
 
 namespace DeliverBox_BE.Controllers
