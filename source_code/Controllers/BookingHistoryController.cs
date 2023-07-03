@@ -36,5 +36,32 @@ namespace DeliverBox_BE.Controllers
             var json = JsonConvert.SerializeObject(list, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
             return Content(json, "application/json");
         }
+
+        [HttpGet(template: "get-history-by-resident")]
+        public ActionResult GetBookingHistoryviaResident (string residentId)
+        {
+            client = new FireSharp.FirebaseClient(config);
+            FirebaseResponse response = client.Get("BookingHistory");
+            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+            var result = new List<BookingHistory>();
+            if (data != null)
+            {
+                foreach (var item in data)
+                {
+                    var value = JsonConvert.DeserializeObject<BookingHistory>(((JProperty)item).Value.ToJson());
+                    var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                    var bh = JsonConvert.DeserializeObject<BookingHistory>(jvalue);
+                    if (bh.residentId == residentId)
+                    {
+                        result.Add(bh);
+                    }
+                }
+            }
+
+            var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+
+            //Json convert
+            return Content(json, "application/json");
+        }
     }
 }

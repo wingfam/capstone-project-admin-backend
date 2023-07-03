@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
 
-namespace DeliverBox_BE.Models;
+namespace DeliverBox_BE.Objects;
 
 public partial class PackageInfo
 {
@@ -19,8 +19,4 @@ public partial class PackageInfo
 
     public string? lockerId { get; set; }
 
-    [JsonIgnore]
-    public virtual Box? Locker { get; set; }
-    [JsonIgnore]
-    public virtual Resident? Resident { get; set; }
 }
