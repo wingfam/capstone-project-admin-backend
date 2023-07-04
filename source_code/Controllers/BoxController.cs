@@ -7,6 +7,7 @@ using FireSharp.Response;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
 
 namespace DeliverBox_BE.Controllers
 {
@@ -37,6 +38,27 @@ namespace DeliverBox_BE.Controllers
                 }
             }
 
+            //Include Cabinet
+            response = client.Get("Cabinet");
+            data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+
+            if (data != null)
+            {
+                foreach (var box in list) //Loop each box in list
+                {
+                    foreach (var item in data) //Loop each cabinet for each box
+                    {
+                        var value = JsonConvert.DeserializeObject<Cabinet>(((JProperty)item).Value.ToJson());
+                        var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                        var c = JsonConvert.DeserializeObject<Cabinet>(jvalue);
+                        if (c.id == box.cabinetId)
+                        {
+                            box.Cabinet = c;
+                        }
+                    }
+                }
+            }
+
             var json = JsonConvert.SerializeObject(list, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
             return Content(json, "application/json");
         }
@@ -62,7 +84,74 @@ namespace DeliverBox_BE.Controllers
                     }
                 }
             }
+
+            //Include Cabinet
+            response = client.Get("Cabinet");
+            data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+
+            if (data != null)
+            {
+                foreach (var item in data) //Loop cabinet data
+                {
+                    var value = JsonConvert.DeserializeObject<Cabinet>(((JProperty)item).Value.ToJson());
+                    var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                    var c = JsonConvert.DeserializeObject<Cabinet>(jvalue);
+                    if (c.id == result.cabinetId)
+                    {
+                        result.Cabinet = c;
+                    }
+                }
+            }
+
             var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+            return Content(json, "application/json");
+        }
+
+        [HttpGet(template: "get-box-by-cabinent")]
+        public ActionResult GetBoxvisCabinet (string cabinetId)
+        {
+            client = new FireSharp.FirebaseClient(config);
+            FirebaseResponse response = client.Get("Box");
+            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+
+            var result = new List<Box>();
+            if(data != null)
+            {
+                foreach (var item in data)
+                {
+                    var value = JsonConvert.DeserializeObject<Box>(((JProperty)item).Value.ToJson());
+                    var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                    var b = JsonConvert.DeserializeObject<Box>(jvalue);
+                    if (b.cabinetId == cabinetId)
+                    {
+                        result.Add(b);
+                    }
+                }
+            }
+
+            //Include Cabinet
+            response = client.Get("Cabinet");
+            data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+
+            if (data != null)
+            {
+                foreach (var box in result) //Loop each box in list
+                {
+                    foreach (var item in data) //Loop each cabinet for each box
+                    {
+                        var value = JsonConvert.DeserializeObject<Cabinet>(((JProperty)item).Value.ToJson());
+                        var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                        var c = JsonConvert.DeserializeObject<Cabinet>(jvalue);
+                        if (c.id == box.cabinetId)
+                        {
+                            box.Cabinet = c;
+                        }
+                    }
+                }
+            }
+
+            var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+            //Json convert
             return Content(json, "application/json");
         }
 
