@@ -7,6 +7,7 @@ using FireSharp.Response;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
 
 namespace MailBoxTest.Controllers
 {
@@ -36,6 +37,27 @@ namespace MailBoxTest.Controllers
                 }
             }
 
+            //Search for Location
+            response = client.Get("Location");
+            data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+
+            if (data != null)
+            {
+                foreach (var resi in list) //Loop in list
+                {
+                    foreach (var item in data) //Loop in location data
+                    {
+                        var value = JsonConvert.DeserializeObject<Location>(((JProperty)item).Value.ToJson());
+                        var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                        var l = JsonConvert.DeserializeObject<Location>(jvalue);
+                        if (l.id == resi.locationId)
+                        {
+                            resi.Location = l;
+                        }
+                    }
+                }
+            }
+
             var json = JsonConvert.SerializeObject(list, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
 
             //Json convert
@@ -59,6 +81,23 @@ namespace MailBoxTest.Controllers
                     if (r.id == id)
                     {
                         result = r;
+                    }
+                }
+            }
+
+            response = client.Get("Location");
+            data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+
+            if (data != null)
+            {
+                foreach (var item in data) //Loop in location data
+                {
+                    var value = JsonConvert.DeserializeObject<Location>(((JProperty)item).Value.ToJson());
+                    var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                    var l = JsonConvert.DeserializeObject<Location>(jvalue);
+                    if (l.id == result.locationId)
+                    {
+                        result.Location = l;
                     }
                 }
             }
@@ -90,6 +129,27 @@ namespace MailBoxTest.Controllers
                 }
             }
 
+            //Search for Location
+            response = client.Get("Location");
+            data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+
+            if (data != null)
+            {
+                foreach (var cabi in result) //Loop in list
+                {
+                    foreach (var item in data) //Loop in location data
+                    {
+                        var value = JsonConvert.DeserializeObject<Location>(((JProperty)item).Value.ToJson());
+                        var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                        var l = JsonConvert.DeserializeObject<Location>(jvalue);
+                        if (l.id == cabi.locationId)
+                        {
+                            cabi.Location = l;
+                        }
+                    }
+                }
+            }
+
             var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
 
             //Json convert
@@ -103,7 +163,7 @@ namespace MailBoxTest.Controllers
             {
                 client = new FireSharp.FirebaseClient(config);
                 //Creating pushing object and put in var 
-                Resident r = new Resident(model.phone, model.email, model.password, model.fullname, true, model.locationId);
+                Resident r = new Resident(model.email, model.password, model.fullname, true, model.locationId);
                 var data = r;
 
                 PushResponse response = client.Push("Resident/", data);

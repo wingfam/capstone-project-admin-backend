@@ -11,9 +11,8 @@ public partial class Resident
     {
     }
 
-    public Resident(string phone, string email, string password, string fullname, bool isAvaiable, string locationId)
+    public Resident(string email, string password, string fullname, bool isAvaiable, string locationId)
     {
-        this.phone = phone;
         this.email = email;
         this.password = password;
         this.fullname = fullname;
@@ -21,8 +20,6 @@ public partial class Resident
         this.locationId = locationId;
     }
     public string id { get; set; } = null!;
-
-    public string phone { get; set; } = null!;
 
     public string? email { get; set; }
 
@@ -32,6 +29,8 @@ public partial class Resident
     public string? locationId { get; set; }
     public bool? isAvaiable { get; set; }
 
+    [JsonIgnore]
+    public virtual Location? Location { get; set; }
     [JsonIgnore]
     [IgnoreDataMember]
     public virtual ICollection<BookingOrder> BookingOrders { get; set; } = new List<BookingOrder>();

@@ -41,6 +41,33 @@ namespace DeliverLocation_BE.Controllers
             return Content(json, "application/json");
         }
 
+        [HttpGet(template: "search")]
+        public ActionResult SearchLocation(string id)
+        {
+            client = new FireSharp.FirebaseClient(config);
+            FirebaseResponse response = client.Get("Location");
+            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+            var result = new Location();
+            if (data != null)
+            {
+                foreach (var item in data)
+                {
+                    var value = JsonConvert.DeserializeObject<Location>(((JProperty)item).Value.ToJson());
+                    var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                    var l = JsonConvert.DeserializeObject<Location>(jvalue);
+                    if (l.id == id)
+                    {
+                        result = l;
+                    }
+                }
+            }
+
+            var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+
+            //Json convert
+            return Content(json, "application/json");
+        }
+
         [HttpPost(template: "add-location")]
         public ActionResult AddLocation([FromBody] LocationAddModel model)
         {
