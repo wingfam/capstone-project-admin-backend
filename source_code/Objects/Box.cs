@@ -28,4 +28,6 @@ public partial class Box
     public bool? isAvaiable { get; set; }
     public string? cabinetId { get; set; }
 
+    [JsonIgnore]
+    public Cabinet? Cabinet { get; set; }
 }
