@@ -1,4 +1,6 @@
-﻿namespace DeliverBox_BE.Objects
+﻿using System.Text.Json.Serialization;
+
+namespace DeliverBox_BE.Objects
 {
     public class Cabinet
     {
@@ -19,5 +21,8 @@
         public DateTime addDate { get; set; }
         public string? locationId { get; set; }
         public bool? isAvaiable { get; set; }
+
+        [JsonIgnore]
+        public virtual Location? Location { get; set; }
     }
 }
