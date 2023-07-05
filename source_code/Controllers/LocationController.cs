@@ -45,22 +45,8 @@ namespace DeliverLocation_BE.Controllers
         public ActionResult SearchLocation(string id)
         {
             client = new FireSharp.FirebaseClient(config);
-            FirebaseResponse response = client.Get("Location");
-            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
-            var result = new Location();
-            if (data != null)
-            {
-                foreach (var item in data)
-                {
-                    var value = JsonConvert.DeserializeObject<Location>(((JProperty)item).Value.ToJson());
-                    var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
-                    var l = JsonConvert.DeserializeObject<Location>(jvalue);
-                    if (l.id == id)
-                    {
-                        result = l;
-                    }
-                }
-            }
+            FirebaseResponse response = client.Get("Location/" + id);
+            var result = JsonConvert.DeserializeObject<Location>(response.Body);
 
             var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
 

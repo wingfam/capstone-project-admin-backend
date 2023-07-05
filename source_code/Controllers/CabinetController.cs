@@ -70,41 +70,13 @@ namespace DeliverCabinet_BE.Controllers
         public ActionResult SearchCabinet (string id) 
         {
             client = new FireSharp.FirebaseClient(config);
-            FirebaseResponse response = client.Get("Cabinet");
-            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+            FirebaseResponse response = client.Get("Cabinet/" + id);
 
-            var result = new Cabinet();
-            if (data != null)
-            {
-                foreach (var item in data)
-                {
-                    var value = JsonConvert.DeserializeObject<Cabinet>(((JProperty)item).Value.ToJson());
-                    var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
-                    var c = JsonConvert.DeserializeObject<Cabinet>(jvalue);
-                    if (c.id == id)
-                    {
-                        result = c;
-                    }
-                }
-            }
+            var result = JsonConvert.DeserializeObject<Cabinet>(response.Body);
 
-            response = client.Get("Location");
-            data = JsonConvert.DeserializeObject<dynamic>(response.Body);
-
-            if (data != null)
-            {
-                    foreach (var item in data) //Loop in location data
-                    {
-                        var value = JsonConvert.DeserializeObject<Location>(((JProperty)item).Value.ToJson());
-                        var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
-                        var l = JsonConvert.DeserializeObject<Location>(jvalue);
-                        if (l.id == result.locationId)
-                        {
-                            result.Location = l;
-                        }
-                    }
-            }
-
+            response = client.Get("Location/" + result.locationId);
+            result.Location = JsonConvert.DeserializeObject<Location>(response.Body);
+            
             var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
             return Content(json, "application/json");
         }
@@ -162,7 +134,7 @@ namespace DeliverCabinet_BE.Controllers
             {
                 client = new FireSharp.FirebaseClient(config);
 
-                var c = new Cabinet(model.name, createDate, model.locationId, model.isAvaiable);
+                var c = new Cabinet(model.name, createDate, model.locationId, model.isAvailable, model.masterCodeId);
 
                 PushResponse pushResponse = client.Push("Cabinet/", c);
                 c.id = pushResponse.Result.name;
@@ -183,29 +155,15 @@ namespace DeliverCabinet_BE.Controllers
         [HttpPut(template: "edit-cabinet")]
         public ActionResult EditCabient (string id, [FromBody] CabinetEditModel model)
         {
-            client = new FireSharp.FirebaseClient(config);
-            FirebaseResponse response = client.Get("Cabinet/");
-            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
-
             try
             {
-                var cabinet = new Cabinet();
-                if (data != null)
-                {
-                    foreach (var item in data)
-                    {
-                        var value = JsonConvert.DeserializeObject<Cabinet>(((JProperty)item).Value.ToJson());
-                        var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
-                        var c = JsonConvert.DeserializeObject<Cabinet>(jvalue);
-                        if (c.id == id)
-                        {
-                            cabinet = c;
-                        }
-                    }
-                }
+                client = new FireSharp.FirebaseClient(config);
+                FirebaseResponse response = client.Get("Cabinet/" + id);
+                var cabinet = JsonConvert.DeserializeObject<Cabinet>(response.Body);
+
                 cabinet.name = model.name;
                 cabinet.locationId = model.locationId;
-                cabinet.isAvaiable = model.isAvaiable;
+                cabinet.isAvailable = model.isAvailable;
 
                 response = client.Update("Cabinet/" + cabinet.id, cabinet);
 
@@ -226,27 +184,13 @@ namespace DeliverCabinet_BE.Controllers
         public ActionResult DeleteCabinet (string id)
         {
             client = new FireSharp.FirebaseClient(config);
-
-            FirebaseResponse response = client.Get("Cabinet");
-            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+            FirebaseResponse response = client.Get("Cabinet/" + id);
 
             try
             {
-                var cabinet = new Cabinet();
-                if (data != null)
-                {
-                    foreach (var item in data)
-                    {
-                        var value = JsonConvert.DeserializeObject<Cabinet>(((JProperty)item).Value.ToJson());
-                        var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
-                        var c = JsonConvert.DeserializeObject<Cabinet>(jvalue);
-                        if (c.id == id)
-                        {
-                            cabinet = c;
-                        }
-                    }
-                }
-                cabinet.isAvaiable = false; //Delede = Change status to false
+                var cabinet = JsonConvert.DeserializeObject<Cabinet>(response.Body);
+                
+                cabinet.isAvailable = false; //Delede = Change status to false
                 response = client.Update("Cabinet/" + cabinet.id, cabinet);
 
                 var result = new { errCode = 0, errMessage = "Success" };

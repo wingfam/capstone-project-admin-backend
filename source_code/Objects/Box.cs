@@ -11,21 +11,20 @@ public partial class Box
     {
     }
 
-    public Box(string name, string size, bool isStore, bool isAvaiable, string cabinetId)
+    public Box(string name, string size, bool isStore, bool isAvailable, string cabinetId)
     {
-        this.name = name;
+        this.nameBox = name;
         this.size = size;
         this.isStore = isStore;
-        this.isAvaiable = isAvaiable;
+        this.isAvailable = isAvailable;
         this.cabinetId = cabinetId;
     }
 
     public string id { get; set; } = null!;
-
-    public string name { get; set; } = null!;
+    public string nameBox { get; set; }
     public string? size { get; set; }
     public bool? isStore { get; set; }
-    public bool? isAvaiable { get; set; }
+    public bool? isAvailable { get; set; }
     public string? cabinetId { get; set; }
 
     [JsonIgnore]

@@ -4,7 +4,7 @@
     {
         public string name { get; set; }
         public bool isStore { get; set; }
-        public bool isAvaiable { get; set; }
+        public bool isAvailable { get; set; }
 
     }
 }

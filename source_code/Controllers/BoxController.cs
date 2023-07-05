@@ -67,27 +67,14 @@ namespace DeliverBox_BE.Controllers
         public ActionResult GetBox(string id)
         {
             client = new FireSharp.FirebaseClient(config);
-            FirebaseResponse response = client.Get("Box");
-            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+            FirebaseResponse response = client.Get("Box/" + id);
 
-            var result = new Box();
-            if (data != null)
-            {
-                foreach (var item in data)
-                {
-                    var value = JsonConvert.DeserializeObject<Box>(((JProperty)item).Value.ToJson());
-                    var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
-                    var l = JsonConvert.DeserializeObject<Box>(jvalue);
-                    if (l.id == id)
-                    {
-                        result = l;
-                    }
-                }
-            }
+            var result = JsonConvert.DeserializeObject<Box>(response.Body);
 
             //Include Cabinet
             response = client.Get("Cabinet");
-            data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+
+            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
 
             if (data != null)
             {
@@ -108,7 +95,7 @@ namespace DeliverBox_BE.Controllers
         }
 
         [HttpGet(template: "get-box-by-cabinent")]
-        public ActionResult GetBoxvisCabinet (string cabinetId)
+        public ActionResult GetBoxviaCabinet (string cabinetId)
         {
             client = new FireSharp.FirebaseClient(config);
             FirebaseResponse response = client.Get("Box");
@@ -145,6 +132,7 @@ namespace DeliverBox_BE.Controllers
                         if (c.id == box.cabinetId)
                         {
                             box.Cabinet = c;
+                            break;
                         }
                     }
                 }
@@ -164,7 +152,7 @@ namespace DeliverBox_BE.Controllers
                 client = new FireSharp.FirebaseClient(config);
                 FirebaseResponse response = client.Get("Box");
 
-                Box l = new Box(model.name, model.size, model.isStore, model.isAvaiable, model.cabinetId);
+                Box l = new Box(model.name, model.size, model.isStore, model.isAvailable, model.cabinetId);
                 var input = l;
 
                 dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
@@ -175,7 +163,7 @@ namespace DeliverBox_BE.Controllers
                         var value = JsonConvert.DeserializeObject<Box>(((JProperty)item).Value.ToJson());
                         var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
                         var box = JsonConvert.DeserializeObject<Box>(jvalue);
-                        if (box.name.ToLower() == model.name.ToLower())
+                        if (box.nameBox.ToLower() == model.name.ToLower())
                         {
                             var errResult = new { errCode = 1, errMessage = "Invalid Box Name" };
                             return Content(JsonConvert.SerializeObject(errResult, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None }), "application/json");
@@ -221,9 +209,9 @@ namespace DeliverBox_BE.Controllers
                         }
                     }
                 }
-                box.name = model.name;
+                box.nameBox = model.name;
                 box.isStore = model.isStore;
-                box.isAvaiable = model.isAvaiable;
+                box.isAvailable = model.isAvailable;
 
                 response = await client.UpdateAsync("Box/" + box.id, box);
 
@@ -263,7 +251,7 @@ namespace DeliverBox_BE.Controllers
                         }
                     }
                 }
-                box.isAvaiable = false; //Delede = Change status to false
+                box.isAvailable = false; //Delede = Change status to false
                 response = await client.UpdateAsync("Box/" + box.id, box);
 
                 var result = new { errCode = 0, errMessage = "Success" };

@@ -68,39 +68,11 @@ namespace MailBoxTest.Controllers
         public ActionResult GetResident(string id)
         {
             client = new FireSharp.FirebaseClient(config);
-            FirebaseResponse response = client.Get("Resident");
-            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
-            var result = new Resident();
-            if (data != null)
-            {
-                foreach (var item in data)
-                {
-                    var value = JsonConvert.DeserializeObject<Resident>(((JProperty)item).Value.ToJson());
-                    var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
-                    var r = JsonConvert.DeserializeObject<Resident>(jvalue);
-                    if (r.id == id)
-                    {
-                        result = r;
-                    }
-                }
-            }
+            FirebaseResponse response = client.Get("Resident/" + id);
+            var result = JsonConvert.DeserializeObject<Resident>(response.Body);
 
-            response = client.Get("Location");
-            data = JsonConvert.DeserializeObject<dynamic>(response.Body);
-
-            if (data != null)
-            {
-                foreach (var item in data) //Loop in location data
-                {
-                    var value = JsonConvert.DeserializeObject<Location>(((JProperty)item).Value.ToJson());
-                    var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
-                    var l = JsonConvert.DeserializeObject<Location>(jvalue);
-                    if (l.id == result.locationId)
-                    {
-                        result.Location = l;
-                    }
-                }
-            }
+            response = client.Get("Location/" + result.locationId);
+            result.Location = JsonConvert.DeserializeObject<Location>(response.Body);
 
             var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
 
@@ -189,24 +161,11 @@ namespace MailBoxTest.Controllers
             try
             {
                 client = new FireSharp.FirebaseClient(config);
-                FirebaseResponse response = client.Get("Resident/");
-                dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+                FirebaseResponse response = client.Get("Resident/" + id);
 
-                var resident = new Resident();
-                if (data != null)
-                {
-                    foreach (var item in data)
-                    {
-                        var value = JsonConvert.DeserializeObject<Resident>(((JProperty)item).Value.ToJson());
-                        var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
-                        var r = JsonConvert.DeserializeObject<Resident>(jvalue);
-                        if (r.id == id)
-                        {
-                            resident = r;
-                        }
-                    }
-                }
-                resident.isAvaiable = model.isAvaiable;
+                var resident = JsonConvert.DeserializeObject<dynamic>(response.Body);
+
+                resident.isAvaiable = model.isAvailable;
 
                 response = await client.UpdateAsync("Resident/" + resident.id, resident);
 
@@ -223,29 +182,17 @@ namespace MailBoxTest.Controllers
         }
 
         [HttpDelete(template: "delete")]
-        public async Task<ActionResult> DeleteResidentAsync(string id)
+        public async Task<ActionResult> DeleteResident(string id)
         {
             client = new FireSharp.FirebaseClient(config);
 
-            FirebaseResponse response = client.Get("Resident");
+            FirebaseResponse response = client.Get("Resident/" + id);
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
 
             try
             {
-                var resident = new Resident();
-                if (data != null)
-                {
-                    foreach (var item in data)
-                    {
-                        var value = JsonConvert.DeserializeObject<Resident>(((JProperty)item).Value.ToJson());
-                        var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
-                        var r = JsonConvert.DeserializeObject<Resident>(jvalue);
-                        if (r.id == id)
-                        {
-                            resident = r;
-                        }
-                    }
-                }
+                var resident = JsonConvert.DeserializeObject<dynamic>(response.Body);
+
                 resident.isAvaiable = false; //Delede = Change status to false
                 response = await client.UpdateAsync("Resident/" + resident.id, resident);
 

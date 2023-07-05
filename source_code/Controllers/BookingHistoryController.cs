@@ -28,6 +28,7 @@ namespace DeliverBox_BE.Controllers
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
 
             var list = new List<BookingHistory>();
+            var temp = new List<BookingHistory>();
             if (data != null)
             {
                 foreach (var item in data)
@@ -35,6 +36,10 @@ namespace DeliverBox_BE.Controllers
                     list.Add(JsonConvert.DeserializeObject<BookingHistory>(((JProperty)item).Value.ToString()));
                 }
             }
+
+            response = client.Get("BookingOrder");
+            data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+
 
             var json = JsonConvert.SerializeObject(list, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
             return Content(json, "application/json");
