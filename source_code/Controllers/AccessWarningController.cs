@@ -75,20 +75,8 @@ namespace DeliverBox_BE.Controllers
 
             try
             {
-                var accessWarning = new AccessWarning();
-                if (data != null)
-                {
-                    foreach (var item in data)
-                    {
-                        var value = JsonConvert.DeserializeObject<AccessWarning>(((JProperty)item).Value.ToJson());
-                        var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
-                        var aw = JsonConvert.DeserializeObject<AccessWarning>(jvalue);
-                        if (aw.id == id)
-                        {
-                            accessWarning = aw;
-                        }
-                    }
-                }
+                var accessWarning = JsonConvert.DeserializeObject<AccessWarning>(response.Body);
+                
                 accessWarning.status = false;
 
                 response = await client.UpdateAsync("AccessWarning/" + accessWarning.id, accessWarning);

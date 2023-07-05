@@ -13,20 +13,17 @@ public partial class BookingOrder
 
     public DateTime? ValidDate { get; set; }
 
-    public bool? status { get; set; }
+    public string? status { get; set; }
+    //InProccess
+    //Done
+    //Storing
 
     public string? residentId { get; set; }
 
-    public string? cabinetId { get; set; }
+    public string? boxId { get; set; }
 
     [JsonIgnore]
-    [IgnoreDataMember]
-    public virtual ICollection<BookingCode> BookingCodes { get; set; } = new List<BookingCode>();
-    [JsonIgnore]
-    [IgnoreDataMember]
-    public virtual ICollection<BookingHistory> BookingHistories { get; set; } = new List<BookingHistory>();
-    [JsonIgnore]
-    public virtual Box? Locker { get; set; }
-    [JsonIgnore]
     public virtual Resident? Resident { get; set; }
+    [JsonIgnore]
+    public virtual Box? Box { get; set; }
 }

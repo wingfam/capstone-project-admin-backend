@@ -16,7 +16,7 @@ public partial class Resident
         this.email = email;
         this.password = password;
         this.fullname = fullname;
-        this.isAvaiable = isAvaiable;
+        this.isAvailable = isAvaiable;
         this.locationId = locationId;
     }
     public string id { get; set; } = null!;
@@ -27,7 +27,7 @@ public partial class Resident
 
     public string? fullname { get; set; }
     public string? locationId { get; set; }
-    public bool? isAvaiable { get; set; }
+    public bool? isAvailable { get; set; }
 
     [JsonIgnore]
     public virtual Location? Location { get; set; }
