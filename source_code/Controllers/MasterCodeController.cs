@@ -60,5 +60,29 @@ namespace DeliverBox_BE.Controllers
                 return Content(json, "application/json");
             }
         }
+
+        [HttpPost(template:("add-master-code"))]
+        public ActionResult AddMasterCode([FromBody] MasterCodeAddModel model) 
+        {
+            try
+            {
+                client = new FireSharp.FirebaseClient(config);
+                MasterCode mcode = new MasterCode(model.code, model.isAvailable);
+
+                PushResponse pResponse = client.Push("MasterCode/", mcode);
+                mcode.id = pResponse.Result.name;
+                SetResponse setResponse = client.Set("MasterCode/" + mcode.id, mcode);
+
+                var result = new { errCode = 0, errMessage = "Success" };
+                var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                return Content(json, "application/json");
+            }
+            catch (Exception ex)
+            {
+                var result = new { errCode = 1, errMessage = ex.Message };
+                var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                return Content(json, "application/json");
+            }
+        }
     }
 }

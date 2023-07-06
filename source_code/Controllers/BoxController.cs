@@ -152,8 +152,7 @@ namespace DeliverBox_BE.Controllers
                 client = new FireSharp.FirebaseClient(config);
                 FirebaseResponse response = client.Get("Box");
 
-                Box l = new Box(model.name, model.size, model.isStore, model.isAvailable, model.cabinetId);
-                var input = l;
+                var input = new Box(model.name, model.size, model.isStore, model.isAvailable, model.cabinetId);
 
                 dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
                 if (data != null)

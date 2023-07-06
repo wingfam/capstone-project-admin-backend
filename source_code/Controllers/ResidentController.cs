@@ -165,7 +165,7 @@ namespace MailBoxTest.Controllers
 
                 var resident = JsonConvert.DeserializeObject<dynamic>(response.Body);
 
-                resident.isAvaiable = model.isAvailable;
+                resident.isAvailable = model.isAvailable;
 
                 response = await client.UpdateAsync("Resident/" + resident.id, resident);
 
