@@ -54,7 +54,7 @@ namespace DeliverBox_BE.Controllers
 
             foreach (var item in list)
             {
-                response = client.Get("Resident" + item.residentId);
+                response = client.Get("Resident/" + item.residentId);
                 item.Resident = JsonConvert.DeserializeObject<Resident>(response.Body);
             }
 
@@ -95,6 +95,12 @@ namespace DeliverBox_BE.Controllers
                     item.BookingOrder = tempBOrder;
                     result.Add(item);
                 }
+            }
+
+            foreach (var item in result)
+            {
+                response = client.Get("Resident/" + item.residentId);
+                item.Resident = JsonConvert.DeserializeObject<Resident>(response.Body);
             }
 
             var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
