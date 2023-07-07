@@ -61,6 +61,11 @@ namespace DeliverCabinet_BE.Controllers
                 }
             }
         
+            foreach(var item in list)
+            {
+                response = client.Get("MasterCode/" + item.masterCodeId);
+                item.MasterCode = JsonConvert.DeserializeObject<MasterCode>(response.Body); 
+            }
 
             var json = JsonConvert.SerializeObject(list, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
             return Content(json, "application/json");
