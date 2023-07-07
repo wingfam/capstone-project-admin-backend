@@ -76,7 +76,10 @@ namespace DeliverCabinet_BE.Controllers
 
             response = client.Get("Location/" + result.locationId);
             result.Location = JsonConvert.DeserializeObject<Location>(response.Body);
-            
+
+            response = client.Get("MasterCode/" + result.masterCodeId);
+            result.MasterCode = JsonConvert.DeserializeObject<MasterCode>(response.Body);
+
             var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
             return Content(json, "application/json");
         }
@@ -93,9 +96,7 @@ namespace DeliverCabinet_BE.Controllers
             {
                 foreach (var item in data)
                 {
-                    var value = JsonConvert.DeserializeObject<Cabinet>(((JProperty)item).Value.ToJson());
-                    var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
-                    var c = JsonConvert.DeserializeObject<Cabinet>(jvalue);
+                    var c = JsonConvert.DeserializeObject<Cabinet>(((JProperty)item).Value.ToJson());
                     if (c.locationId == locationId)
                     {
                         result.Add(c);
@@ -103,13 +104,17 @@ namespace DeliverCabinet_BE.Controllers
                 }
             }
 
-            if (data != null)
+            foreach (var cabi in result) //Loop in list
             {
-                foreach (var cabi in result) //Loop in list
-                {
-                    response = client.Get("Location/" + cabi.locationId);
-                    cabi.Location = JsonConvert.DeserializeObject<Location>(response.Body);
-                }
+                response = client.Get("Location/" + cabi.locationId);
+                cabi.Location = JsonConvert.DeserializeObject<Location>(response.Body);
+            }
+            
+
+            foreach (var cabi in result)
+            {
+                response = client.Get("MasterCode/" + cabi.masterCodeId);
+                cabi.MasterCode = JsonConvert.DeserializeObject<MasterCode>(response.Body);
             }
 
             var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
@@ -156,6 +161,7 @@ namespace DeliverCabinet_BE.Controllers
                 cabinet.name = model.name;
                 cabinet.locationId = model.locationId;
                 cabinet.isAvailable = model.isAvailable;
+                cabinet.masterCodeId = model.masterCodeId;
 
                 response = client.Update("Cabinet/" + cabinet.id, cabinet);
 
