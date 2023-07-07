@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
 
 namespace DeliverBox_BE.Controllers
 {
@@ -84,12 +85,21 @@ namespace DeliverBox_BE.Controllers
             return Content(json, "application/json");
         }
 
-        //[HttpGet(template: "search")]
-        //public ActionResult GetBookingOrder (string id)
-        //{
-        //    client = new FireSharp.FirebaseClient(config);
-        //    FirebaseResponse response = client.Get("BookingOrder/" + id);
-        //    dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
-        //}
+        [HttpGet(template: "search")]
+        public ActionResult GetBookingOrder(string id)
+        {
+            client = new FireSharp.FirebaseClient(config);
+            FirebaseResponse response = client.Get("BookingOrder/" + id);
+            var bookingOrder = JsonConvert.DeserializeObject<BookingOrder>(response.Body);
+
+            response = client.Get("Resident/" + bookingOrder.residentId);
+            bookingOrder.Resident = JsonConvert.DeserializeObject<Resident>(response.Body);
+
+            response = client.Get("Box/" + bookingOrder.boxId);
+            bookingOrder.Box = JsonConvert.DeserializeObject<Box>(response.Body);
+
+            var json = JsonConvert.SerializeObject(bookingOrder, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+            return Content(json, "application/json");
+        }
     }
 }

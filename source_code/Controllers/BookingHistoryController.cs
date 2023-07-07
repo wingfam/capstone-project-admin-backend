@@ -33,13 +33,29 @@ namespace DeliverBox_BE.Controllers
             {
                 foreach (var item in data)
                 {
-                    list.Add(JsonConvert.DeserializeObject<BookingHistory>(((JProperty)item).Value.ToString()));
+                    temp.Add(JsonConvert.DeserializeObject<BookingHistory>(((JProperty)item).Value.ToString()));
                 }
             }
 
-            response = client.Get("BookingOrder");
-            data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+            //Add Obj BookingOrder to the temp List
+            var tempBOrder = new BookingOrder();
+            foreach(var item in temp)
+            {
+                response = client.Get("BookingOrder/" + item.bookingId);
+                tempBOrder = JsonConvert.DeserializeObject<BookingOrder>(response.Body);
+                
+                if(tempBOrder.status.ToLower() == "done") //BookingOrder Status need tobe Done to be added
+                {
+                    item.BookingOrder = tempBOrder;
+                    list.Add(item);
+                }
+            }
 
+            foreach (var item in list)
+            {
+                response = client.Get("Resident" + item.residentId);
+                item.Resident = JsonConvert.DeserializeObject<Resident>(response.Body);
+            }
 
             var json = JsonConvert.SerializeObject(list, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
             return Content(json, "application/json");

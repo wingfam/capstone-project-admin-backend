@@ -14,5 +14,5 @@ public partial class BookingHistory
     [JsonIgnore]
     public virtual BookingOrder? BookingOrder { get; set; }
     [JsonIgnore]
-    public virtual Resident Resident { get; set; }
+    public virtual Resident? Resident { get; set; }
 }
