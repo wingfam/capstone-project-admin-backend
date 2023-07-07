@@ -81,7 +81,7 @@ namespace DeliverCabinet_BE.Controllers
             return Content(json, "application/json");
         }
 
-        [HttpGet(template: "get-cabient-by-location")]
+        [HttpGet(template: "get-cabinet-by-location")]
         public ActionResult GetCabinetviaLocation(string locationId)
         {
             client = new FireSharp.FirebaseClient(config);
@@ -107,16 +107,8 @@ namespace DeliverCabinet_BE.Controllers
             {
                 foreach (var cabi in result) //Loop in list
                 {
-                    foreach (var item in data) //Loop in location data
-                    {
-                        var value = JsonConvert.DeserializeObject<Location>(((JProperty)item).Value.ToJson());
-                        var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
-                        var l = JsonConvert.DeserializeObject<Location>(jvalue);
-                        if (l.id == cabi.locationId)
-                        {
-                            cabi.Location = l;
-                        }
-                    }
+                    response = client.Get("Location/" + cabi.locationId);
+                    cabi.Location = JsonConvert.DeserializeObject<Location>(response.Body);
                 }
             }
 
@@ -126,7 +118,7 @@ namespace DeliverCabinet_BE.Controllers
             return Content(json, "application/json");
         }
 
-        [HttpPost(template: "add-cabient")]
+        [HttpPost(template: "add-cabinet")]
         public ActionResult AddWCabinet([FromBody] CabinetAddModel model)
         {
             DateTime createDate = DateTime.Now;

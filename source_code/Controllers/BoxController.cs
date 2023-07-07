@@ -94,7 +94,7 @@ namespace DeliverBox_BE.Controllers
             return Content(json, "application/json");
         }
 
-        [HttpGet(template: "get-box-by-cabinent")]
+        [HttpGet(template: "get-box-by-cabinet")]
         public ActionResult GetBoxviaCabinet (string cabinetId)
         {
             client = new FireSharp.FirebaseClient(config);
