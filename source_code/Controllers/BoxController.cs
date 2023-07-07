@@ -48,9 +48,7 @@ namespace DeliverBox_BE.Controllers
                 {
                     foreach (var item in data) //Loop each cabinet for each box
                     {
-                        var value = JsonConvert.DeserializeObject<Cabinet>(((JProperty)item).Value.ToJson());
-                        var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
-                        var c = JsonConvert.DeserializeObject<Cabinet>(jvalue);
+                        var c = JsonConvert.DeserializeObject<Cabinet>(((JProperty)item).Value.ToJson());
                         if (c.id == box.cabinetId)
                         {
                             box.Cabinet = c;
@@ -241,9 +239,7 @@ namespace DeliverBox_BE.Controllers
                 {
                     foreach (var item in data)
                     {
-                        var value = JsonConvert.DeserializeObject<Box>(((JProperty)item).Value.ToJson());
-                        var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
-                        var l = JsonConvert.DeserializeObject<Box>(jvalue);
+                        var l = JsonConvert.DeserializeObject<Box>(((JProperty)item).Value.ToJson());
                         if (l.id == id)
                         {
                             box = l;
