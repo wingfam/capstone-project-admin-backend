@@ -11,7 +11,7 @@ public partial class BookingOrder
 
     public DateTime? createDate { get; set; }
 
-    public DateTime? ValidDate { get; set; }
+    public DateTime? validDate { get; set; }
 
     public string? status { get; set; }
     //InProccess
