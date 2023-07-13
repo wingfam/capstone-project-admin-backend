@@ -46,9 +46,7 @@ namespace DeliverBox_BE.Controllers
                 foreach (var order in list) { 
                     foreach (var item in data)
                     {
-                        var value = JsonConvert.DeserializeObject<Resident>(((JProperty)item).Value.ToJson());
-                        var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
-                        var r = JsonConvert.DeserializeObject<Resident>(jvalue);
+                        var r = JsonConvert.DeserializeObject<Resident>(((JProperty)item).Value.ToJson());
                         if (r.id == order.residentId)
                         {
                             order.Resident = r;
@@ -69,9 +67,7 @@ namespace DeliverBox_BE.Controllers
                 {
                     foreach (var item in data)
                     {
-                        var value = JsonConvert.DeserializeObject<Box>(((JProperty)item).Value.ToJson());
-                        var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
-                        var b = JsonConvert.DeserializeObject<Box>(jvalue);
+                        var b = JsonConvert.DeserializeObject<Box>(((JProperty)item).Value.ToJson());
                         if (b.id == order.boxId)
                         {
                             order.Box = b;

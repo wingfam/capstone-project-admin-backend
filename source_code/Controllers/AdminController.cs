@@ -94,9 +94,7 @@ namespace MailBoxTest.Controllers
                 {
                     foreach (var item in data)
                     {
-                        var value = JsonConvert.DeserializeObject<Admin>(((JProperty)item).Value.ToJson());
-                        var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
-                        var r = JsonConvert.DeserializeObject<Admin>(jvalue);
+                        var r = JsonConvert.DeserializeObject<Admin>(((JProperty)item).Value.ToJson());
                         if (r.username.ToLower() == model.username.ToLower())
                         {
                             if (r.password ==  model.password)

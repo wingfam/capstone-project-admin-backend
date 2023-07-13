@@ -48,6 +48,8 @@ namespace DeliverBox_BE.Controllers
                 if(tempBOrder.status.ToLower() == "done") //BookingOrder Status need tobe Done to be added
                 {
                     item.BookingOrder = tempBOrder;
+                    response = client.Get("Box/" + item.BookingOrder.boxId);
+                    item.BookingOrder.Box = JsonConvert.DeserializeObject<Box>(response.Body);
                     list.Add(item);
                 }
             }
@@ -56,6 +58,8 @@ namespace DeliverBox_BE.Controllers
             {
                 response = client.Get("Resident/" + item.residentId);
                 item.Resident = JsonConvert.DeserializeObject<Resident>(response.Body);
+                response = client.Get("Location/" + item.Resident.locationId);
+                item.Resident.Location = JsonConvert.DeserializeObject<Location>(response.Body);
             }
 
             var json = JsonConvert.SerializeObject(list, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
@@ -93,14 +97,19 @@ namespace DeliverBox_BE.Controllers
                 if (tempBOrder.status.ToLower() == "done") //BookingOrder Status need tobe Done to be added
                 {
                     item.BookingOrder = tempBOrder;
+                    response = client.Get("Box/" + item.BookingOrder.boxId);
+                    item.BookingOrder.Box = JsonConvert.DeserializeObject<Box>(response.Body);
                     result.Add(item);
                 }
             }
 
+            //Add Obj Resident to the list
             foreach (var item in result)
             {
                 response = client.Get("Resident/" + item.residentId);
                 item.Resident = JsonConvert.DeserializeObject<Resident>(response.Body);
+                response = client.Get("Location/" + item.Resident.locationId);
+                item.Resident.Location = JsonConvert.DeserializeObject<Location>(response.Body);
             }
 
             var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
