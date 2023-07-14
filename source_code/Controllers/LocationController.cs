@@ -24,34 +24,50 @@ namespace DeliverLocation_BE.Controllers
         [HttpGet(template: "get-all")]
         public ActionResult GetAllLocation()
         {
-            client = new FireSharp.FirebaseClient(config);
-            FirebaseResponse response = client.Get("Location");
-            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
-
-            var list = new List<Location>();
-            if (data != null)
+            try
             {
-                foreach (var item in data)
-                {
-                    list.Add(JsonConvert.DeserializeObject<Location>(((JProperty)item).Value.ToString()));
-                }
-            }
+                client = new FireSharp.FirebaseClient(config);
+                FirebaseResponse response = client.Get("Location");
+                dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
 
-            var json = JsonConvert.SerializeObject(list, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
-            return Content(json, "application/json");
+                var list = new List<Location>();
+                if (data != null)
+                {
+                    foreach (var item in data)
+                    {
+                        list.Add(JsonConvert.DeserializeObject<Location>(((JProperty)item).Value.ToString()));
+                    }
+                }
+
+                var json = JsonConvert.SerializeObject(list, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                return Content(json, "application/json");
+            } catch (Exception ex)
+            {
+                var result = new { errCode = 1, errMessage = ex.Message };
+                var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                return Content(json, "application/json");
+            }
         }
 
         [HttpGet(template: "search")]
         public ActionResult SearchLocation(string id)
         {
-            client = new FireSharp.FirebaseClient(config);
-            FirebaseResponse response = client.Get("Location/" + id);
-            var result = JsonConvert.DeserializeObject<Location>(response.Body);
+            try
+            {
+                client = new FireSharp.FirebaseClient(config);
+                FirebaseResponse response = client.Get("Location/" + id);
+                var result = JsonConvert.DeserializeObject<Location>(response.Body);
 
-            var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
 
-            //Json convert
-            return Content(json, "application/json");
+                //Json convert
+                return Content(json, "application/json");
+            } catch(Exception ex)
+            {
+                var result = new { errCode = 1, errMessage = ex.Message };
+                var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                return Content(json, "application/json");
+            }
         }
 
         [HttpPost(template: "add-location")]

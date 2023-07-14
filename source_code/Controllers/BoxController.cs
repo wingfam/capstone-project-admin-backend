@@ -25,120 +25,144 @@ namespace DeliverBox_BE.Controllers
         [HttpGet(template:"get-all")]
         public ActionResult GetBoxs ()
         {
-            client = new FireSharp.FirebaseClient(config);
-            FirebaseResponse response = client.Get("Box");
-            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
-
-            var list = new List<Box>();
-            if(data != null)
+            try
             {
-                foreach(var item in data)
-                {
-                    list.Add(JsonConvert.DeserializeObject<Box>(((JProperty)item).Value.ToString()));
-                }
-            }
+                client = new FireSharp.FirebaseClient(config);
+                FirebaseResponse response = client.Get("Box");
+                dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
 
-            //Include Cabinet
-            response = client.Get("Cabinet");
-            data = JsonConvert.DeserializeObject<dynamic>(response.Body);
-
-            if (data != null)
-            {
-                foreach (var box in list) //Loop each box in list
+                var list = new List<Box>();
+                if (data != null)
                 {
-                    foreach (var item in data) //Loop each cabinet for each box
+                    foreach (var item in data)
                     {
-                        var c = JsonConvert.DeserializeObject<Cabinet>(((JProperty)item).Value.ToJson());
-                        if (c.id == box.cabinetId)
+                        list.Add(JsonConvert.DeserializeObject<Box>(((JProperty)item).Value.ToString()));
+                    }
+                }
+
+                //Include Cabinet
+                response = client.Get("Cabinet");
+                data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+
+                if (data != null)
+                {
+                    foreach (var box in list) //Loop each box in list
+                    {
+                        foreach (var item in data) //Loop each cabinet for each box
                         {
-                            box.Cabinet = c;
+                            var c = JsonConvert.DeserializeObject<Cabinet>(((JProperty)item).Value.ToJson());
+                            if (c.id == box.cabinetId)
+                            {
+                                box.Cabinet = c;
+                            }
                         }
                     }
                 }
-            }
 
-            var json = JsonConvert.SerializeObject(list, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
-            return Content(json, "application/json");
+                var json = JsonConvert.SerializeObject(list, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                return Content(json, "application/json");
+            } catch (Exception ex)
+            {
+                var result = new { errCode = 1, errMessage = ex.Message };
+                var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                return Content(json, "application/json");
+            }
         }
 
         [HttpGet(template: "search")]
         public ActionResult GetBox(string id)
         {
-            client = new FireSharp.FirebaseClient(config);
-            FirebaseResponse response = client.Get("Box/" + id);
-
-            var result = JsonConvert.DeserializeObject<Box>(response.Body);
-
-            //Include Cabinet
-            response = client.Get("Cabinet");
-
-            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
-
-            if (data != null)
+            try
             {
-                foreach (var item in data) //Loop cabinet data
+                client = new FireSharp.FirebaseClient(config);
+                FirebaseResponse response = client.Get("Box/" + id);
+
+                var result = JsonConvert.DeserializeObject<Box>(response.Body);
+
+                //Include Cabinet
+                response = client.Get("Cabinet");
+
+                dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+
+                if (data != null)
                 {
-                    var value = JsonConvert.DeserializeObject<Cabinet>(((JProperty)item).Value.ToJson());
-                    var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
-                    var c = JsonConvert.DeserializeObject<Cabinet>(jvalue);
-                    if (c.id == result.cabinetId)
+                    foreach (var item in data) //Loop cabinet data
                     {
-                        result.Cabinet = c;
+                        var value = JsonConvert.DeserializeObject<Cabinet>(((JProperty)item).Value.ToJson());
+                        var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                        var c = JsonConvert.DeserializeObject<Cabinet>(jvalue);
+                        if (c.id == result.cabinetId)
+                        {
+                            result.Cabinet = c;
+                        }
                     }
                 }
-            }
 
-            var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
-            return Content(json, "application/json");
+                var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                return Content(json, "application/json");
+            } catch (Exception ex)
+            {
+                var result = new { errCode = 1, errMessage = ex.Message };
+                var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                return Content(json, "application/json");
+            }
         }
 
         [HttpGet(template: "get-box-by-cabinet")]
         public ActionResult GetBoxviaCabinet (string cabinetId)
         {
-            client = new FireSharp.FirebaseClient(config);
-            FirebaseResponse response = client.Get("Box");
-            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
-
-            var result = new List<Box>();
-            if(data != null)
+            try
             {
-                foreach (var item in data)
-                {
-                    var value = JsonConvert.DeserializeObject<Box>(((JProperty)item).Value.ToJson());
-                    var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
-                    var b = JsonConvert.DeserializeObject<Box>(jvalue);
-                    if (b.cabinetId == cabinetId)
-                    {
-                        result.Add(b);
-                    }
-                }
-            }
+                client = new FireSharp.FirebaseClient(config);
+                FirebaseResponse response = client.Get("Box");
+                dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
 
-            //Include Cabinet
-            response = client.Get("Cabinet");
-            data = JsonConvert.DeserializeObject<dynamic>(response.Body);
-
-            if (data != null)
-            {
-                foreach (var box in result) //Loop each box in list
+                var result = new List<Box>();
+                if (data != null)
                 {
-                    foreach (var item in data) //Loop each cabinet for each box
+                    foreach (var item in data)
                     {
-                        var value = JsonConvert.DeserializeObject<Cabinet>(((JProperty)item).Value.ToJson());
+                        var value = JsonConvert.DeserializeObject<Box>(((JProperty)item).Value.ToJson());
                         var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
-                        var c = JsonConvert.DeserializeObject<Cabinet>(jvalue);
-                        if (c.id == box.cabinetId)
+                        var b = JsonConvert.DeserializeObject<Box>(jvalue);
+                        if (b.cabinetId == cabinetId)
                         {
-                            box.Cabinet = c;
-                            break;
+                            result.Add(b);
                         }
                     }
                 }
-            }
 
-            var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
-            //Json convert
-            return Content(json, "application/json");
+                //Include Cabinet
+                response = client.Get("Cabinet");
+                data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+
+                if (data != null)
+                {
+                    foreach (var box in result) //Loop each box in list
+                    {
+                        foreach (var item in data) //Loop each cabinet for each box
+                        {
+                            var value = JsonConvert.DeserializeObject<Cabinet>(((JProperty)item).Value.ToJson());
+                            var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                            var c = JsonConvert.DeserializeObject<Cabinet>(jvalue);
+                            if (c.id == box.cabinetId)
+                            {
+                                box.Cabinet = c;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                //Json convert
+                return Content(json, "application/json");
+            } catch (Exception ex)
+            {
+                var result = new { errCode = 1, errMessage = ex.Message };
+                var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                return Content(json, "application/json");
+            }
         }
 
         [HttpPost(template:"add-box")]
