@@ -25,107 +25,131 @@ namespace MailBoxTest.Controllers
         [HttpGet(template:"get-all")]
         public ActionResult GetResidents()
         {
-            client = new FireSharp.FirebaseClient(config);
-            FirebaseResponse response = client.Get("Resident");
-            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
-            var list = new List<Resident>();
-            if (data != null)
+            try
             {
-                foreach (var item in data)
+                client = new FireSharp.FirebaseClient(config);
+                FirebaseResponse response = client.Get("Resident");
+                dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+                var list = new List<Resident>();
+                if (data != null)
                 {
-                    list.Add(JsonConvert.DeserializeObject<Resident>(((JProperty)item).Value.ToString()));
-                }
-            }
-
-            //Search for Location
-            response = client.Get("Location");
-            data = JsonConvert.DeserializeObject<dynamic>(response.Body);
-
-            if (data != null)
-            {
-                foreach (var resi in list) //Loop in list
-                {
-                    foreach (var item in data) //Loop in location data
+                    foreach (var item in data)
                     {
-                        var value = JsonConvert.DeserializeObject<Location>(((JProperty)item).Value.ToJson());
-                        var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
-                        var l = JsonConvert.DeserializeObject<Location>(jvalue);
-                        if (l.id == resi.locationId)
+                        list.Add(JsonConvert.DeserializeObject<Resident>(((JProperty)item).Value.ToString()));
+                    }
+                }
+
+                //Search for Location
+                response = client.Get("Location");
+                data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+
+                if (data != null)
+                {
+                    foreach (var resi in list) //Loop in list
+                    {
+                        foreach (var item in data) //Loop in location data
                         {
-                            resi.Location = l;
+                            var value = JsonConvert.DeserializeObject<Location>(((JProperty)item).Value.ToJson());
+                            var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                            var l = JsonConvert.DeserializeObject<Location>(jvalue);
+                            if (l.id == resi.locationId)
+                            {
+                                resi.Location = l;
+                            }
                         }
                     }
                 }
+
+                var json = JsonConvert.SerializeObject(list, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+
+                //Json convert
+                return Content(json, "application/json");
+            } catch (Exception ex)
+            {
+                var result = new { errCode = 1, errMessage = ex.Message };
+                var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                return Content(json, "application/json");
             }
-
-            var json = JsonConvert.SerializeObject(list, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
-
-            //Json convert
-            return Content(json, "application/json");
         }
 
         [HttpGet(template: "search")]
         public ActionResult GetResident(string id)
         {
-            client = new FireSharp.FirebaseClient(config);
-            FirebaseResponse response = client.Get("Resident/" + id);
-            var result = JsonConvert.DeserializeObject<Resident>(response.Body);
+            try
+            {
+                client = new FireSharp.FirebaseClient(config);
+                FirebaseResponse response = client.Get("Resident/" + id);
+                var result = JsonConvert.DeserializeObject<Resident>(response.Body);
 
-            response = client.Get("Location/" + result.locationId);
-            result.Location = JsonConvert.DeserializeObject<Location>(response.Body);
+                response = client.Get("Location/" + result.locationId);
+                result.Location = JsonConvert.DeserializeObject<Location>(response.Body);
 
-            var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
 
-            //Json convert
-            return Content(json, "application/json");
+                //Json convert
+                return Content(json, "application/json");
+            } catch (Exception ex)
+            {
+                var result = new { errCode = 1, errMessage = ex.Message };
+                var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                return Content(json, "application/json");
+            }
         }
 
         [HttpGet(template: "get-resident-by-location")]
         public ActionResult GetResidentviaLocation(string locationId)
         {
-            client = new FireSharp.FirebaseClient(config);
-            FirebaseResponse response = client.Get("Resident");
-            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
-            var result = new List<Resident>();
-            if (data != null)
+            try
             {
-                foreach (var item in data)
+                client = new FireSharp.FirebaseClient(config);
+                FirebaseResponse response = client.Get("Resident");
+                dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+                var result = new List<Resident>();
+                if (data != null)
                 {
-                    var value = JsonConvert.DeserializeObject<Resident>(((JProperty)item).Value.ToJson());
-                    var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
-                    var r = JsonConvert.DeserializeObject<Resident>(jvalue);
-                    if (r.locationId == locationId)
+                    foreach (var item in data)
                     {
-                        result.Add(r);
-                    }
-                }
-            }
-
-            //Search for Location
-            response = client.Get("Location");
-            data = JsonConvert.DeserializeObject<dynamic>(response.Body);
-
-            if (data != null)
-            {
-                foreach (var cabi in result) //Loop in list
-                {
-                    foreach (var item in data) //Loop in location data
-                    {
-                        var value = JsonConvert.DeserializeObject<Location>(((JProperty)item).Value.ToJson());
+                        var value = JsonConvert.DeserializeObject<Resident>(((JProperty)item).Value.ToJson());
                         var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
-                        var l = JsonConvert.DeserializeObject<Location>(jvalue);
-                        if (l.id == cabi.locationId)
+                        var r = JsonConvert.DeserializeObject<Resident>(jvalue);
+                        if (r.locationId == locationId)
                         {
-                            cabi.Location = l;
+                            result.Add(r);
                         }
                     }
                 }
+
+                //Search for Location
+                response = client.Get("Location");
+                data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+
+                if (data != null)
+                {
+                    foreach (var cabi in result) //Loop in list
+                    {
+                        foreach (var item in data) //Loop in location data
+                        {
+                            var value = JsonConvert.DeserializeObject<Location>(((JProperty)item).Value.ToJson());
+                            var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                            var l = JsonConvert.DeserializeObject<Location>(jvalue);
+                            if (l.id == cabi.locationId)
+                            {
+                                cabi.Location = l;
+                            }
+                        }
+                    }
+                }
+
+                var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+
+                //Json convert
+                return Content(json, "application/json");
+            } catch (Exception ex)
+            {
+                var result = new { errCode = 1, errMessage = ex.Message };
+                var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                return Content(json, "application/json");
             }
-
-            var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
-
-            //Json convert
-            return Content(json, "application/json");
         }
 
         [HttpPost(template:"add-resident")]

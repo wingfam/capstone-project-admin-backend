@@ -11,7 +11,7 @@ using DeliverBox_BE.Models;
 
 namespace DeliverCabinet_BE.Controllers
 {
-    [Route("api/v1/Cabinet")]
+    [Route("api/v1/cabinet")]
     [ApiController]
     public class CabinetController : Controller
     {
@@ -26,106 +26,130 @@ namespace DeliverCabinet_BE.Controllers
         [HttpGet(template: "get-all")]
         public ActionResult GetAllCabinet ()
         {
-            client = new FireSharp.FirebaseClient(config);
-            FirebaseResponse response = client.Get("Cabinet");
-            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
-
-            var list = new List<Cabinet>();
-            var temp = new Cabinet();
-            if (data != null)
+            try
             {
-                foreach (var item in data)
-                {
-                    list.Add(JsonConvert.DeserializeObject<Cabinet>(((JProperty)item).Value.ToString()));
-                }
-            }
+                client = new FireSharp.FirebaseClient(config);
+                FirebaseResponse response = client.Get("Cabinet");
+                dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
 
-            //Search for Location
-            response = client.Get("Location");
-            data = JsonConvert.DeserializeObject<dynamic>(response.Body);
-
-            if (data != null)
-            {
-                foreach (var cabi in list) //Loop in list
+                var list = new List<Cabinet>();
+                var temp = new Cabinet();
+                if (data != null)
                 {
-                    foreach (var item in data) //Loop in location data
+                    foreach (var item in data)
                     {
-                        var value = JsonConvert.DeserializeObject<Location>(((JProperty)item).Value.ToJson());
-                        var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
-                        var l = JsonConvert.DeserializeObject<Location>(jvalue);
-                        if (l.id == cabi.locationId)
+                        list.Add(JsonConvert.DeserializeObject<Cabinet>(((JProperty)item).Value.ToString()));
+                    }
+                }
+
+                //Search for Location
+                response = client.Get("Location");
+                data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+
+                if (data != null)
+                {
+                    foreach (var cabi in list) //Loop in list
+                    {
+                        foreach (var item in data) //Loop in location data
                         {
-                            cabi.Location = l;
+                            var value = JsonConvert.DeserializeObject<Location>(((JProperty)item).Value.ToJson());
+                            var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                            var l = JsonConvert.DeserializeObject<Location>(jvalue);
+                            if (l.id == cabi.locationId)
+                            {
+                                cabi.Location = l;
+                            }
                         }
                     }
                 }
-            }
-        
-            foreach(var item in list)
-            {
-                response = client.Get("MasterCode/" + item.masterCodeId);
-                item.MasterCode = JsonConvert.DeserializeObject<MasterCode>(response.Body); 
-            }
 
-            var json = JsonConvert.SerializeObject(list, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
-            return Content(json, "application/json");
+                foreach (var item in list)
+                {
+                    response = client.Get("MasterCode/" + item.masterCodeId);
+                    item.MasterCode = JsonConvert.DeserializeObject<MasterCode>(response.Body);
+                }
+
+                var json = JsonConvert.SerializeObject(list, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                return Content(json, "application/json");
+            } catch (Exception ex)
+            {
+                var result = new { errCode = 1, errMessage = ex.Message };
+                var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                return Content(json, "application/json");
+            }
         }
 
         [HttpGet(template: "search")]
         public ActionResult SearchCabinet (string id) 
         {
-            client = new FireSharp.FirebaseClient(config);
-            FirebaseResponse response = client.Get("Cabinet/" + id);
+            try
+            {
+                client = new FireSharp.FirebaseClient(config);
+                FirebaseResponse response = client.Get("Cabinet/" + id);
 
-            var result = JsonConvert.DeserializeObject<Cabinet>(response.Body);
+                var result = JsonConvert.DeserializeObject<Cabinet>(response.Body);
 
-            response = client.Get("Location/" + result.locationId);
-            result.Location = JsonConvert.DeserializeObject<Location>(response.Body);
+                response = client.Get("Location/" + result.locationId);
+                result.Location = JsonConvert.DeserializeObject<Location>(response.Body);
 
-            response = client.Get("MasterCode/" + result.masterCodeId);
-            result.MasterCode = JsonConvert.DeserializeObject<MasterCode>(response.Body);
+                response = client.Get("MasterCode/" + result.masterCodeId);
+                result.MasterCode = JsonConvert.DeserializeObject<MasterCode>(response.Body);
 
-            var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
-            return Content(json, "application/json");
+                var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                return Content(json, "application/json");
+            } catch (Exception ex)
+            {
+                var result = new { errCode = 1, errMessage = ex.Message };
+                var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                return Content(json, "application/json");
+            }
         }
 
         [HttpGet(template: "get-cabinet-by-location")]
         public ActionResult GetCabinetviaLocation(string locationId)
         {
-            client = new FireSharp.FirebaseClient(config);
-            FirebaseResponse response = client.Get("Cabinet");
-            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
-
-            var result = new List<Cabinet>();
-            if (data != null)
+            try
             {
-                foreach (var item in data)
+                client = new FireSharp.FirebaseClient(config);
+                FirebaseResponse response = client.Get("Cabinet");
+                dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+
+                var result = new List<Cabinet>();
+                if (data != null)
                 {
-                    var c = JsonConvert.DeserializeObject<Cabinet>(((JProperty)item).Value.ToJson());
-                    if (c.locationId == locationId)
+                    foreach (var item in data)
                     {
-                        result.Add(c);
+                        var c = JsonConvert.DeserializeObject<Cabinet>(((JProperty)item).Value.ToJson());
+                        if (c.locationId == locationId)
+                        {
+                            result.Add(c);
+                        }
                     }
                 }
-            }
 
-            foreach (var cabi in result) //Loop in list
+                foreach (var cabi in result) //Loop in list
+                {
+                    response = client.Get("Location/" + cabi.locationId);
+                    cabi.Location = JsonConvert.DeserializeObject<Location>(response.Body);
+                }
+
+
+                foreach (var cabi in result)
+                {
+                    response = client.Get("MasterCode/" + cabi.masterCodeId);
+                    cabi.MasterCode = JsonConvert.DeserializeObject<MasterCode>(response.Body);
+                }
+
+                var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+
+                //Json convert
+                return Content(json, "application/json");
+            } catch (Exception ex)
             {
-                response = client.Get("Location/" + cabi.locationId);
-                cabi.Location = JsonConvert.DeserializeObject<Location>(response.Body);
+                var result = new { errCode = 1, errMessage = ex.Message };
+                var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                return Content(json, "application/json");
             }
-            
-
-            foreach (var cabi in result)
-            {
-                response = client.Get("MasterCode/" + cabi.masterCodeId);
-                cabi.MasterCode = JsonConvert.DeserializeObject<MasterCode>(response.Body);
-            }
-
-            var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
-
-            //Json convert
-            return Content(json, "application/json");
         }
 
         [HttpPost(template: "add-cabinet")]
@@ -186,11 +210,13 @@ namespace DeliverCabinet_BE.Controllers
         [HttpDelete(template: "delete-cabinet")]
         public ActionResult DeleteCabinet (string id)
         {
-            client = new FireSharp.FirebaseClient(config);
-            FirebaseResponse response = client.Get("Cabinet/" + id);
+            
 
             try
             {
+                client = new FireSharp.FirebaseClient(config);
+                FirebaseResponse response = client.Get("Cabinet/" + id);
+
                 var cabinet = JsonConvert.DeserializeObject<Cabinet>(response.Body);
                 
                 cabinet.isAvailable = false; //Delede = Change status to false

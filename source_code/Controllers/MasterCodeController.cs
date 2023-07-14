@@ -24,22 +24,30 @@ namespace DeliverBox_BE.Controllers
         [HttpGet(template: "get-mastercode")]
         public ActionResult GetMasterCodes()
         {
-            client = new FireSharp.FirebaseClient(config);
-            FirebaseResponse response = client.Get("MasterCode/");
-            dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
-
-            var list = new List<MasterCode>();
-            if(data != null)
+            try
             {
-                foreach (var item in data)
-                {
-                    var m = JsonConvert.DeserializeObject<MasterCode>(((JProperty)item).Value.ToJson());
-                    list.Add(m);
-                }
-            }
+                client = new FireSharp.FirebaseClient(config);
+                FirebaseResponse response = client.Get("MasterCode/");
+                dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
 
-            var json = JsonConvert.SerializeObject(list, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
-            return Content(json, "application/json");
+                var list = new List<MasterCode>();
+                if (data != null)
+                {
+                    foreach (var item in data)
+                    {
+                        var m = JsonConvert.DeserializeObject<MasterCode>(((JProperty)item).Value.ToJson());
+                        list.Add(m);
+                    }
+                }
+
+                var json = JsonConvert.SerializeObject(list, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                return Content(json, "application/json");
+            } catch (Exception ex)
+            {
+                var result = new { errCode = 1, errMessage = ex.Message };
+                var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                return Content(json, "application/json");
+            }
         }
 
         [HttpPut(template: "edit-master-code")]
