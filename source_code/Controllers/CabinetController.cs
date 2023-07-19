@@ -63,12 +63,6 @@ namespace DeliverCabinet_BE.Controllers
                     }
                 }
 
-                foreach (var item in list)
-                {
-                    response = client.Get("MasterCode/" + item.masterCodeId);
-                    item.MasterCode = JsonConvert.DeserializeObject<MasterCode>(response.Body);
-                }
-
                 var json = JsonConvert.SerializeObject(list, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
                 return Content(json, "application/json");
             } catch (Exception ex)
@@ -91,9 +85,6 @@ namespace DeliverCabinet_BE.Controllers
 
                 response = client.Get("Location/" + result.locationId);
                 result.Location = JsonConvert.DeserializeObject<Location>(response.Body);
-
-                response = client.Get("MasterCode/" + result.masterCodeId);
-                result.MasterCode = JsonConvert.DeserializeObject<MasterCode>(response.Body);
 
                 var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
                 return Content(json, "application/json");
@@ -133,13 +124,6 @@ namespace DeliverCabinet_BE.Controllers
                     cabi.Location = JsonConvert.DeserializeObject<Location>(response.Body);
                 }
 
-
-                foreach (var cabi in result)
-                {
-                    response = client.Get("MasterCode/" + cabi.masterCodeId);
-                    cabi.MasterCode = JsonConvert.DeserializeObject<MasterCode>(response.Body);
-                }
-
                 var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
 
                 //Json convert
@@ -160,7 +144,7 @@ namespace DeliverCabinet_BE.Controllers
             {
                 client = new FireSharp.FirebaseClient(config);
 
-                var c = new Cabinet(model.name, createDate, model.locationId, model.isAvailable, model.masterCodeId);
+                var c = new Cabinet(model.name, createDate, model.locationId, model.isAvailable);
 
                 PushResponse pushResponse = client.Push("Cabinet/", c);
                 c.id = pushResponse.Result.name;
@@ -190,7 +174,6 @@ namespace DeliverCabinet_BE.Controllers
                 cabinet.name = model.name;
                 cabinet.locationId = model.locationId;
                 cabinet.isAvailable = model.isAvailable;
-                cabinet.masterCodeId = model.masterCodeId;
 
                 response = client.Update("Cabinet/" + cabinet.id, cabinet);
 
