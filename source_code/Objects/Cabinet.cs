@@ -24,7 +24,5 @@ namespace DeliverBox_BE.Objects
 
         [JsonIgnore]
         public virtual Location? Location { get; set; }
-        [JsonIgnore]
-        public virtual MasterCode? MasterCode { get; set; }
     }
 }

@@ -38,6 +38,12 @@ namespace DeliverBox_BE.Controllers
                         var m = JsonConvert.DeserializeObject<MasterCode>(((JProperty)item).Value.ToJson());
                         list.Add(m);
                     }
+
+                    foreach (var item in list)
+                    {
+                        response = client.Get("Cabinet/" + item.cabinetId);
+                        item.Cabinet = JsonConvert.DeserializeObject<Cabinet>(response.Body);
+                    }
                 }
 
                 var json = JsonConvert.SerializeObject(list, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
@@ -97,7 +103,7 @@ namespace DeliverBox_BE.Controllers
             try
             {
                 client = new FireSharp.FirebaseClient(config);
-                MasterCode mcode = new MasterCode(model.code, model.isAvailable);
+                MasterCode mcode = new MasterCode(model.code, model.isAvailable, model.cabinetId);
 
                 PushResponse pResponse = client.Push("MasterCode/", mcode);
                 mcode.id = pResponse.Result.name;
