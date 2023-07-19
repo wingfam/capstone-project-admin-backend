@@ -80,6 +80,23 @@ namespace DeliverBox_BE.Controllers
             }
         }
 
+        //[HttpGet(template: "")]
+        //public ActionResult GetOrderByResidentAndBox (string residentId, string boxId)
+        //{
+        //    try
+        //    {
+                
+
+        //        var json = JsonConvert.SerializeObject(list, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+        //        return Content(json, "application/json");
+        //    } catch (Exception ex)
+        //    {
+        //        var result = new { errCode = 1, errMessage = ex.Message };
+        //        var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+        //        return Content(json, "application/json");
+        //    }
+        //}
+
         [HttpGet(template: "search")]
         public ActionResult GetBookingOrder(string id)
         {
