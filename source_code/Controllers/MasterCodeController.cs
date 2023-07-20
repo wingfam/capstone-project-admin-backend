@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Identity.Client;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
 
 namespace DeliverBox_BE.Controllers
 {
@@ -43,12 +44,50 @@ namespace DeliverBox_BE.Controllers
                     {
                         response = client.Get("Cabinet/" + item.cabinetId);
                         item.Cabinet = JsonConvert.DeserializeObject<Cabinet>(response.Body);
+                        response = client.Get("Location/" + item.Cabinet.locationId);
+                        item.Cabinet.Location = JsonConvert.DeserializeObject<Location>(response.Body);
                     }
                 }
 
                 var json = JsonConvert.SerializeObject(list, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
                 return Content(json, "application/json");
             } catch (Exception ex)
+            {
+                var result = new { errCode = 1, errMessage = ex.Message };
+                var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                return Content(json, "application/json");
+            }
+        }
+
+        [HttpGet("get-mastercode-by-cabinet-id")]
+        public ActionResult GetMasterCodeviaCabinet(string cabientId)
+        {
+            try
+            {
+                client = new FireSharp.FirebaseClient(config);
+                FirebaseResponse response = client.Get("MasterCode");
+                dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+
+                var result = new MasterCode();
+                if(data != null)
+                {
+                    foreach (var item in data)
+                    {
+                        result = JsonConvert.DeserializeObject<MasterCode>(((JProperty)item).Value.ToJson());
+                        if(result.cabinetId == cabientId) { break; }
+                    }
+
+                    response = client.Get("Cabinet/" + result.cabinetId);
+                    result.Cabinet = JsonConvert.DeserializeObject<Cabinet>(response.Body);
+
+                    response = client.Get("Location/" + result.Cabinet.locationId);
+                    result.Cabinet.Location = JsonConvert.DeserializeObject<Location>(response.Body);
+                }
+
+                var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                return Content(json, "application/json");
+            }
+            catch (Exception ex)
             {
                 var result = new { errCode = 1, errMessage = ex.Message };
                 var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
@@ -70,9 +109,7 @@ namespace DeliverBox_BE.Controllers
                 {
                     foreach (var item in data)
                     {
-                        var value = JsonConvert.DeserializeObject<MasterCode>(((JProperty)item).Value.ToJson());
-                        var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
-                        var mc = JsonConvert.DeserializeObject<MasterCode>(jvalue);
+                        var mc = JsonConvert.DeserializeObject<MasterCode>(((JProperty)item).Value.ToJson());
                         if (mc.id == id)
                         {
                             masterCode = mc;
