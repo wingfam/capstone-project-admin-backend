@@ -119,6 +119,7 @@ namespace DeliverBox_BE.Controllers
                 }
                 masterCode.code = model.code;
                 masterCode.isAvailable = model.isAvailable;
+                masterCode.cabinetId = model.cabinetId;
 
                 response = client.Update("MasterCode/" + masterCode.id, masterCode);
 
