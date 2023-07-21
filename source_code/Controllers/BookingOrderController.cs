@@ -67,7 +67,7 @@ namespace DeliverBox_BE.Controllers
         }
 
         [HttpGet(template: "get-order-by-resident-and-box")]
-        public ActionResult GetOrderByResidentAndBox(string residentId, string boxId)
+        public ActionResult GetOrderByResidentAndBox(string? residentId, string? boxId)
         {
             try
             {
@@ -81,7 +81,7 @@ namespace DeliverBox_BE.Controllers
                     foreach (var item in data)
                     {
                         temp = JsonConvert.DeserializeObject<BookingOrder>(((JProperty)item).Value.ToString());
-                        if(temp.residentId == residentId && temp.boxId == boxId)
+                        if(temp.residentId == residentId || temp.boxId == boxId)
                         {
                             list.Add(temp);
                         }
