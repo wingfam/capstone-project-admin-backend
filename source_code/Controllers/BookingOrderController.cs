@@ -54,6 +54,8 @@ namespace DeliverBox_BE.Controllers
                 {
                     response = client.Get("Box/" + order.boxId);
                     order.Box = JsonConvert.DeserializeObject<Box>(response.Body);
+                    response = client.Get("Cabinet/" + order.Box.cabinetId);
+                    order.Box.Cabinet = JsonConvert.DeserializeObject<Cabinet>(response.Body);
                 }
 
                 var json = JsonConvert.SerializeObject(list, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
@@ -81,9 +83,24 @@ namespace DeliverBox_BE.Controllers
                     foreach (var item in data)
                     {
                         temp = JsonConvert.DeserializeObject<BookingOrder>(((JProperty)item).Value.ToString());
-                        if(temp.residentId == residentId || temp.boxId == boxId)
+                        if (residentId == null)
                         {
-                            list.Add(temp);
+                            if(temp.boxId == boxId)
+                            {
+                                list.Add(temp);
+                            }
+                        } else if (boxId == null)
+                        {
+                            if(temp.residentId == residentId)
+                            {
+                                list.Add(temp);
+                            }
+                        } else
+                        {
+                            if (temp.residentId == residentId && temp.boxId == boxId)
+                            {
+                                list.Add(temp);
+                            }
                         }
                     }
 
@@ -133,6 +150,8 @@ namespace DeliverBox_BE.Controllers
 
                 response = client.Get("Box/" + bookingOrder.boxId);
                 bookingOrder.Box = JsonConvert.DeserializeObject<Box>(response.Body);
+                response = client.Get("Cabinet/" + order.Box.cabinetId);
+                order.Box.Cabinet = JsonConvert.DeserializeObject<Cabinet>(response.Body);
 
                 var json = JsonConvert.SerializeObject(bookingOrder, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
                 return Content(json, "application/json");
