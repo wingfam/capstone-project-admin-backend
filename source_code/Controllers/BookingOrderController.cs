@@ -150,8 +150,8 @@ namespace DeliverBox_BE.Controllers
 
                 response = client.Get("Box/" + bookingOrder.boxId);
                 bookingOrder.Box = JsonConvert.DeserializeObject<Box>(response.Body);
-                response = client.Get("Cabinet/" + order.Box.cabinetId);
-                order.Box.Cabinet = JsonConvert.DeserializeObject<Cabinet>(response.Body);
+                response = client.Get("Cabinet/" + bookingOrder.Box.cabinetId);
+                bookingOrder.Box.Cabinet = JsonConvert.DeserializeObject<Cabinet>(response.Body);
 
                 var json = JsonConvert.SerializeObject(bookingOrder, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
                 return Content(json, "application/json");
