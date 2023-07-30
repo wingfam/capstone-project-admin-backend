@@ -90,7 +90,7 @@ namespace DeliverBox_BE.Controllers
                 var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
                 return Content(json, "application/json");
             }
-            catch (Exception ex)
+            catch (Exception ex)    
             {
                 var result = new { errCode = 1, errMessage = ex.Message };
                 var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
@@ -125,5 +125,22 @@ namespace DeliverBox_BE.Controllers
             }
         }
 
+        //public ActionResult GetCharData1 ()
+        //{
+        //    try
+        //    {
+        //        DateTime now = DateTime.Now;
+        //        client = new FireSharp.FirebaseClient(config);
+
+        //        FirebaseResponse response = client.Get("BookingOrder");
+        //        dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        var result = new { errCode = 1, errMessage = ex.Message };
+        //        var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+        //        return Content(json, "application/json");
+        //    }
+        //}
     }
 }
