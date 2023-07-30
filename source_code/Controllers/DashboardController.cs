@@ -1,4 +1,5 @@
-﻿using FireSharp.Config;
+﻿using DeliverBox_BE.Objects;
+using FireSharp.Config;
 using FireSharp.Interfaces;
 using FireSharp.Response;
 using Microsoft.AspNetCore.Mvc;
@@ -70,6 +71,33 @@ namespace DeliverBox_BE.Controllers
             }
         }
 
+        [HttpGet(template: "get-total-cabinet")]
+        public ActionResult GetTotalCabinet()
+        {
+            try
+            {
+                client = new FireSharp.FirebaseClient(config);
+                FirebaseResponse response = client.Get("Cabinet");
+
+                int count = 0;
+                dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+                foreach (var item in data)
+                {
+                    count++; //Count the number  of cabinet in the data list
+                }
+                var result = new { obj = "Total Cabinet", count = count };
+
+                var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                return Content(json, "application/json");
+            }
+            catch (Exception ex)    
+            {
+                var result = new { errCode = 1, errMessage = ex.Message };
+                var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                return Content(json, "application/json");
+            }
+        }
+
         [HttpGet(template: "get-total-order")]
         public ActionResult GetTotalOrder()
         {
@@ -77,7 +105,7 @@ namespace DeliverBox_BE.Controllers
             {
                 client = new FireSharp.FirebaseClient(config);
                 FirebaseResponse response = client.Get("BookingOrder");
-
+                
                 int count = 0;
                 dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
                 foreach (var item in data)
@@ -96,5 +124,23 @@ namespace DeliverBox_BE.Controllers
                 return Content(json, "application/json");
             }
         }
+
+        //public ActionResult GetCharData1 ()
+        //{
+        //    try
+        //    {
+        //        DateTime now = DateTime.Now;
+        //        client = new FireSharp.FirebaseClient(config);
+
+        //        FirebaseResponse response = client.Get("BookingOrder");
+        //        dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        var result = new { errCode = 1, errMessage = ex.Message };
+        //        var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+        //        return Content(json, "application/json");
+        //    }
+        //}
     }
 }
