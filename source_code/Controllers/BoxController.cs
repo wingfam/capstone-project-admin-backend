@@ -41,22 +41,12 @@ namespace DeliverBox_BE.Controllers
                 }
 
                 //Include Cabinet
-                response = client.Get("Cabinet");
-                data = JsonConvert.DeserializeObject<dynamic>(response.Body);
-
-                if (data != null)
+                foreach (var item in list)
                 {
-                    foreach (var box in list) //Loop each box in list
-                    {
-                        foreach (var item in data) //Loop each cabinet for each box
-                        {
-                            var c = JsonConvert.DeserializeObject<Cabinet>(((JProperty)item).Value.ToJson());
-                            if (c.id == box.cabinetId)
-                            {
-                                box.Cabinet = c;
-                            }
-                        }
-                    }
+                    response = client.Get("Cabinet/" + item.cabinetId);
+                    item.Cabinet = JsonConvert.DeserializeObject<Cabinet>(response.Body);
+                    response = client.Get("Location/" + item.Cabinet.locationId);
+                    item.Cabinet.Location = JsonConvert.DeserializeObject<Location>(response.Body);
                 }
 
                 var json = JsonConvert.SerializeObject(list, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
@@ -80,21 +70,11 @@ namespace DeliverBox_BE.Controllers
                 var result = JsonConvert.DeserializeObject<Box>(response.Body);
 
                 //Include Cabinet
-                response = client.Get("Cabinet");
-
-                dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
-
-                if (data != null)
-                {
-                    foreach (var item in data) //Loop cabinet data
-                    {
-                        var c = JsonConvert.DeserializeObject<Cabinet>(((JProperty)item).Value.ToJson());
-                        if (c.id == result.cabinetId)
-                        {
-                            result.Cabinet = c;
-                        }
-                    }
-                }
+                    response = client.Get("Cabinet/" + result.cabinetId);
+                    result.Cabinet = JsonConvert.DeserializeObject<Cabinet>(response.Body);
+                    response = client.Get("Location/" + result.Cabinet.locationId);
+                    result.Cabinet.Location = JsonConvert.DeserializeObject<Location>(response.Body);
+                
 
                 var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
                 return Content(json, "application/json");
@@ -129,27 +109,13 @@ namespace DeliverBox_BE.Controllers
                 }
 
                 //Include Cabinet
-                response = client.Get("Cabinet");
-                data = JsonConvert.DeserializeObject<dynamic>(response.Body);
-
-                if (data != null)
+                foreach (var item in result)
                 {
-                    foreach (var box in result) //Loop each box in list
-                    {
-                        foreach (var item in data) //Loop each cabinet for each box
-                        {
-                            var value = JsonConvert.DeserializeObject<Cabinet>(((JProperty)item).Value.ToJson());
-                            var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
-                            var c = JsonConvert.DeserializeObject<Cabinet>(jvalue);
-                            if (c.id == box.cabinetId)
-                            {
-                                box.Cabinet = c;
-                                break;
-                            }
-                        }
-                    }
+                    response = client.Get("Cabinet/" + cabinetId);
+                    item.Cabinet = JsonConvert.DeserializeObject<Cabinet>(response.Body);
+                    response = client.Get("Location/" + item.Cabinet.locationId);
+                    item.Cabinet.Location = JsonConvert.DeserializeObject<Location>(response.Body);
                 }
-
                 var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
                 //Json convert
                 return Content(json, "application/json");
