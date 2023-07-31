@@ -177,6 +177,28 @@ namespace DeliverCabinet_BE.Controllers
 
                 response = client.Update("Cabinet/" + cabinet.id, cabinet);
 
+                //Change Box availability
+                if (cabinet.isAvailable == true)
+                {
+                    response = client.Get("Box");
+                    dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+
+                    var list = new List<Box>();
+                    if (data != null)
+                    {
+                        foreach (var item in data)
+                        {
+                            list.Add(JsonConvert.DeserializeObject<Box>(((JProperty)item).Value.ToString()));
+                        }
+                    }
+
+                    foreach (var box in list)
+                    {
+                        box.isAvailable = true;
+                        response = client.Update("Box/" + box.id, box); //Update to firebase
+                    }
+                }
+
                 var result = new { errCode = 0, errMessage = "Success" };
                 var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
 

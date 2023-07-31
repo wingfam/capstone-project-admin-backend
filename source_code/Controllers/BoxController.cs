@@ -192,8 +192,6 @@ namespace DeliverBox_BE.Controllers
                         }
                     }
                 }
-                box.nameBox = model.name;
-                box.isStore = model.isStore;
                 box.isAvailable = model.isAvailable;
 
                 response = await client.UpdateAsync("Box/" + box.id, box);
