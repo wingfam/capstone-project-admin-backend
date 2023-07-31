@@ -193,8 +193,6 @@ namespace DeliverCabinet_BE.Controllers
         [HttpDelete(template: "delete-cabinet")]
         public ActionResult DeleteCabinet (string id)
         {
-            
-
             try
             {
                 client = new FireSharp.FirebaseClient(config);
@@ -204,6 +202,25 @@ namespace DeliverCabinet_BE.Controllers
                 
                 cabinet.isAvailable = false; //Delede = Change status to false
                 response = client.Update("Cabinet/" + cabinet.id, cabinet);
+
+                //Set Box to false
+                response = client.Get("Box");
+                dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+
+                var list = new List<Box>();
+                if (data != null)
+                {
+                    foreach (var item in data)
+                    {
+                        list.Add(JsonConvert.DeserializeObject<Box>(((JProperty)item).Value.ToString()));
+                    }
+                }
+
+                foreach (var box in list)
+                {
+                    box.isAvailable = false;
+                    response = client.Update("Box/" + box.id, box); //Update to firebase
+                }
 
                 var result = new { errCode = 0, errMessage = "Success" };
                 var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
