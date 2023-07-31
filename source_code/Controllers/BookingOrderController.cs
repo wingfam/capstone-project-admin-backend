@@ -83,7 +83,10 @@ namespace DeliverBox_BE.Controllers
                     foreach (var item in data)
                     {
                         temp = JsonConvert.DeserializeObject<BookingOrder>(((JProperty)item).Value.ToString());
-                        if (residentId == null)
+                        if (residentId == null && boxId == null)
+                        {
+                           list.Add(temp);
+                        } else if (residentId == null)
                         {
                             if(temp.boxId == boxId)
                             {
