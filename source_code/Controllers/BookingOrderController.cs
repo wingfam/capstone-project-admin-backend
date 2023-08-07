@@ -24,7 +24,6 @@ namespace DeliverBox_BE.Controllers
         IFirebaseClient client;
 
         [HttpGet(template:"get-all")]
-        [Authorize]
         public IActionResult GetBookingOrders ()
         {
             try
