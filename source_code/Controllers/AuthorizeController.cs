@@ -4,6 +4,8 @@ using DeliverBox_BE.Objects;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -27,8 +29,9 @@ namespace DeliverBox_BE.Controllers
             var user = Authenticate(userModel);
             if (user != null)
             {
-                var token = GenerateToken(user);
-                return Ok(token);
+                var result = new { token = GenerateToken(user) };
+                var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                return Content(json, "application/json");
             }
 
             return NotFound("user not found");
@@ -41,7 +44,7 @@ namespace DeliverBox_BE.Controllers
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
             var claims = new[]
             {
-                new Claim(ClaimTypes.NameIdentifier,user.Username),
+                new Claim(ClaimTypes.MobilePhone,user.Phone),
                 new Claim(ClaimTypes.Role,user.Role)
             };
             var token = new JwtSecurityToken(_config["Jwt:Issuer"],
@@ -56,8 +59,8 @@ namespace DeliverBox_BE.Controllers
         //To authenticate user
         private User Authenticate(UserLoginModel userLogin)
         {
-            var currentUser = UserConstants.Users.FirstOrDefault(x => x.Username.ToLower() ==
-                userLogin.Username.ToLower() && x.Password == userLogin.Password);
+            var currentUser = UserConstants.Users.FirstOrDefault(x => x.Phone.ToLower() ==
+                userLogin.Phone.ToLower() && x.Password == userLogin.Password);
             if (currentUser != null)
             {
                 return currentUser;

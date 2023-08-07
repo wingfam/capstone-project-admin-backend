@@ -6,7 +6,7 @@ namespace DeliverBox_BE.Misc
     {
         public static List<User> Users = new()
             {
-                    new User(){ Username="minh69",Password="123456",Role="User"}
+                    new User(){ Phone="0123456789",Password="123456",Role="User"}
             };
     }
 }
