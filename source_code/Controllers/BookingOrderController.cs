@@ -3,6 +3,7 @@ using FireSharp.Config;
 using FireSharp.Extensions;
 using FireSharp.Interfaces;
 using FireSharp.Response;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Newtonsoft.Json;
@@ -23,7 +24,8 @@ namespace DeliverBox_BE.Controllers
         IFirebaseClient client;
 
         [HttpGet(template:"get-all")]
-        public ActionResult GetBookingOrders ()
+        [Authorize]
+        public IActionResult GetBookingOrders ()
         {
             try
             {
