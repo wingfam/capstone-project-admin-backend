@@ -2,8 +2,11 @@
 {
     public class CabinetEditModel
     {
-        public string name { get; set; }
+        public string? name { get; set; }
         public string locationId { get; set; }
-        public bool isAvailable { get; set; }
+        public string bussinessId { get; set; }
+        public int status { get; set; }
+        public string? mastercode { get; set; }
+        public string? mastercodeStatus { get; set; }
     }
 }

@@ -43,26 +43,18 @@ namespace DeliverCabinet_BE.Controllers
                 }
 
                 //Search for Location
-                response = client.Get("Location");
-                data = JsonConvert.DeserializeObject<dynamic>(response.Body);
-
-                if (data != null)
+                foreach (var item in list)
                 {
-                    foreach (var cabi in list) //Loop in list
-                    {
-                        foreach (var item in data) //Loop in location data
-                        {
-                            var value = JsonConvert.DeserializeObject<Location>(((JProperty)item).Value.ToJson());
-                            var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
-                            var l = JsonConvert.DeserializeObject<Location>(jvalue);
-                            if (l.id == cabi.locationId)
-                            {
-                                cabi.Location = l;
-                            }
-                        }
-                    }
+                    response = client.Get("Location/" + item.bussinessId);
+                    item.Bussiness = JsonConvert.DeserializeObject<Bussiness>(response.Body);
                 }
 
+                //Search for bussiness
+                foreach (var item in list)
+                {
+                    response = client.Get("Bussiness/" + item.bussinessId);
+                    item.Bussiness = JsonConvert.DeserializeObject<Bussiness>(response.Body);
+                }
                 var json = JsonConvert.SerializeObject(list, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
                 return Content(json, "application/json");
             } catch (Exception ex)
@@ -85,6 +77,9 @@ namespace DeliverCabinet_BE.Controllers
 
                 response = client.Get("Location/" + result.locationId);
                 result.Location = JsonConvert.DeserializeObject<Location>(response.Body);
+
+                response = client.Get("Location/" + result.bussinessId);
+                result.Bussiness = JsonConvert.DeserializeObject<Bussiness>(response.Body);
 
                 var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
                 return Content(json, "application/json");
@@ -123,7 +118,12 @@ namespace DeliverCabinet_BE.Controllers
                     response = client.Get("Location/" + cabi.locationId);
                     cabi.Location = JsonConvert.DeserializeObject<Location>(response.Body);
                 }
-
+                //Search for bussiness
+                foreach (var item in result)
+                {
+                    response = client.Get("Bussiness/" + item.bussinessId);
+                    item.Bussiness = JsonConvert.DeserializeObject<Bussiness>(response.Body);
+                }
                 var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
 
                 //Json convert
@@ -144,7 +144,7 @@ namespace DeliverCabinet_BE.Controllers
             {
                 client = new FireSharp.FirebaseClient(config);
 
-                var c = new Cabinet(model.name, createDate, model.locationId, model.isAvailable);
+                var c = new Cabinet(model.name, createDate, 0, model.locationId, model.bussinessId, 0, null, null);
 
                 PushResponse pushResponse = client.Push("Cabinet/", c);
                 c.id = pushResponse.Result.name;
@@ -173,12 +173,21 @@ namespace DeliverCabinet_BE.Controllers
 
                 cabinet.name = model.name;
                 cabinet.locationId = model.locationId;
-                cabinet.isAvailable = model.isAvailable;
+                cabinet.bussinessId = model.bussinessId;
+                cabinet.status = model.status;
+                if(model.mastercode != null)
+                {
+                    cabinet.masterCode = model.mastercode;
+                }
+                if(model.mastercodeStatus != null)
+                {
+                    cabinet.masterCodeStatus = model.mastercodeStatus;
+                }
 
                 response = client.Update("Cabinet/" + cabinet.id, cabinet);
 
                 //Change Box availability
-                if (cabinet.isAvailable == true)
+                if (cabinet.status == 1)
                 {
                     response = client.Get("Box");
                     dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
@@ -222,7 +231,7 @@ namespace DeliverCabinet_BE.Controllers
 
                 var cabinet = JsonConvert.DeserializeObject<Cabinet>(response.Body);
                 
-                cabinet.isAvailable = false; //Delede = Change status to false
+                cabinet.status = 0; //Delede = Change status to false
                 response = client.Update("Cabinet/" + cabinet.id, cabinet);
 
                 //Set Box to false

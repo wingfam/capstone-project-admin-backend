@@ -45,7 +45,7 @@ namespace DeliverBox_BE.Controllers
                 foreach (var order in list)
                 {
                     response = client.Get("Resident/" + order.residentId);
-                    order.Resident = JsonConvert.DeserializeObject<Resident>(response.Body);
+                    order.Resident = JsonConvert.DeserializeObject<Bussiness>(response.Body);
                     response = client.Get("Location/" + order.Resident.locationId);
                     order.Resident.Location = JsonConvert.DeserializeObject<Location>(response.Body);
                 }
@@ -112,7 +112,7 @@ namespace DeliverBox_BE.Controllers
                     foreach (var order in list)
                     {
                         response = client.Get("Resident/" + order.residentId);
-                        order.Resident = JsonConvert.DeserializeObject<Resident>(response.Body);
+                        order.Resident = JsonConvert.DeserializeObject<Bussiness>(response.Body);
                         response = client.Get("Location/" + order.Resident.locationId);
                         order.Resident.Location = JsonConvert.DeserializeObject<Location>(response.Body);
                     }
@@ -148,7 +148,7 @@ namespace DeliverBox_BE.Controllers
                 var bookingOrder = JsonConvert.DeserializeObject<BookingOrder>(response.Body);
 
                 response = client.Get("Resident/" + bookingOrder.residentId);
-                bookingOrder.Resident = JsonConvert.DeserializeObject<Resident>(response.Body);
+                bookingOrder.Resident = JsonConvert.DeserializeObject<Bussiness>(response.Body);
                 response = client.Get("Location/" + bookingOrder.Resident.locationId);
                 bookingOrder.Resident.Location = JsonConvert.DeserializeObject<Location>(response.Body);
 

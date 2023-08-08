@@ -30,12 +30,12 @@ namespace MailBoxTest.Controllers
                 client = new FireSharp.FirebaseClient(config);
                 FirebaseResponse response = client.Get("Resident");
                 dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
-                var list = new List<Resident>();
+                var list = new List<Bussiness>();
                 if (data != null)
                 {
                     foreach (var item in data)
                     {
-                        list.Add(JsonConvert.DeserializeObject<Resident>(((JProperty)item).Value.ToString()));
+                        list.Add(JsonConvert.DeserializeObject<Bussiness>(((JProperty)item).Value.ToString()));
                     }
                 }
 
@@ -79,7 +79,7 @@ namespace MailBoxTest.Controllers
             {
                 client = new FireSharp.FirebaseClient(config);
                 FirebaseResponse response = client.Get("Resident/" + id);
-                var result = JsonConvert.DeserializeObject<Resident>(response.Body);
+                var result = JsonConvert.DeserializeObject<Bussiness>(response.Body);
 
                 response = client.Get("Location/" + result.locationId);
                 result.Location = JsonConvert.DeserializeObject<Location>(response.Body);
@@ -104,14 +104,14 @@ namespace MailBoxTest.Controllers
                 client = new FireSharp.FirebaseClient(config);
                 FirebaseResponse response = client.Get("Resident");
                 dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
-                var result = new List<Resident>();
+                var result = new List<Bussiness>();
                 if (data != null)
                 {
                     foreach (var item in data)
                     {
-                        var value = JsonConvert.DeserializeObject<Resident>(((JProperty)item).Value.ToJson());
+                        var value = JsonConvert.DeserializeObject<Bussiness>(((JProperty)item).Value.ToJson());
                         var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
-                        var r = JsonConvert.DeserializeObject<Resident>(jvalue);
+                        var r = JsonConvert.DeserializeObject<Bussiness>(jvalue);
                         if (r.locationId == locationId)
                         {
                             result.Add(r);
@@ -159,7 +159,7 @@ namespace MailBoxTest.Controllers
             {
                 client = new FireSharp.FirebaseClient(config);
                 //Creating pushing object and put in var 
-                Resident r = new Resident(model.email, model.password, model.fullname, true, model.locationId);
+                Bussiness r = new Bussiness(model.email, model.password, model.fullname, true, model.locationId);
                 var data = r;
 
                 PushResponse response = client.Push("Resident/", data);

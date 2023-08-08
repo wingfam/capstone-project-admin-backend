@@ -23,7 +23,7 @@ public partial class BookingOrder
     public string? boxId { get; set; }
 
     [JsonIgnore]
-    public virtual Resident? Resident { get; set; }
+    public virtual Bussiness? Resident { get; set; }
     [JsonIgnore]
     public virtual Box? Box { get; set; }
 }
