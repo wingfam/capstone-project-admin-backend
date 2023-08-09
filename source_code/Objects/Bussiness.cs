@@ -11,26 +11,17 @@ public partial class Bussiness
     {
     }
 
-    public Bussiness(string email, string password, string fullname, bool isAvaiable, string locationId)
+    public Bussiness(string name, string address, string phone, int status)
     {
-        this.email = email;
-        this.password = password;
-        this.fullname = fullname;
-        this.isAvailable = isAvaiable;
-        this.locationId = locationId;
+        this.bussinessName = name;
+        this.address = address;
+        this.phone = phone;
+        this.status = status;
     }
     public string id { get; set; } = null!;
-
     public string? bussinessName { get; set; }
-
     public string? address { get; set; }
-
     public string? phone { get; set; }
-    public string? status { get; set; }
+    public int? status { get; set; }
 
-    [JsonIgnore]
-    public virtual Location? Location { get; set; }
-    [JsonIgnore]
-    [IgnoreDataMember]
-    public virtual ICollection<BookingOrder> BookingOrders { get; set; } = new List<BookingOrder>();
 }
