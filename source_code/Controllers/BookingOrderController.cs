@@ -44,10 +44,8 @@ namespace DeliverBox_BE.Controllers
                 //Include Resident data
                 foreach (var order in list)
                 {
-                    response = client.Get("Resident/" + order.residentId);
-                    order.Resident = JsonConvert.DeserializeObject<Resident>(response.Body);
-                    response = client.Get("Location/" + order.Resident.locationId);
-                    order.Resident.Location = JsonConvert.DeserializeObject<Location>(response.Body);
+                    response = client.Get("Business/" + order.busnessId);
+                    order.Business = JsonConvert.DeserializeObject<Business>(response.Body);
                 }
 
                 //Include Box data
@@ -95,13 +93,13 @@ namespace DeliverBox_BE.Controllers
                             }
                         } else if (boxId == null)
                         {
-                            if(temp.residentId == residentId)
+                            if(temp.busnessId == residentId)
                             {
                                 list.Add(temp);
                             }
                         } else
                         {
-                            if (temp.residentId == residentId && temp.boxId == boxId)
+                            if (temp.busnessId == residentId && temp.boxId == boxId)
                             {
                                 list.Add(temp);
                             }
@@ -111,10 +109,8 @@ namespace DeliverBox_BE.Controllers
                     //Include Resident data
                     foreach (var order in list)
                     {
-                        response = client.Get("Resident/" + order.residentId);
-                        order.Resident = JsonConvert.DeserializeObject<Resident>(response.Body);
-                        response = client.Get("Location/" + order.Resident.locationId);
-                        order.Resident.Location = JsonConvert.DeserializeObject<Location>(response.Body);
+                        response = client.Get("Business/" + order.busnessId);
+                        order.Business = JsonConvert.DeserializeObject<Business>(response.Body);
                     }
 
                     //Include Box data
@@ -147,10 +143,8 @@ namespace DeliverBox_BE.Controllers
                 FirebaseResponse response = client.Get("BookingOrder/" + id);
                 var bookingOrder = JsonConvert.DeserializeObject<BookingOrder>(response.Body);
 
-                response = client.Get("Resident/" + bookingOrder.residentId);
-                bookingOrder.Resident = JsonConvert.DeserializeObject<Resident>(response.Body);
-                response = client.Get("Location/" + bookingOrder.Resident.locationId);
-                bookingOrder.Resident.Location = JsonConvert.DeserializeObject<Location>(response.Body);
+                response = client.Get("Business/" + bookingOrder.busnessId);
+                bookingOrder.Business = JsonConvert.DeserializeObject<Business>(response.Body);
 
                 response = client.Get("Box/" + bookingOrder.boxId);
                 bookingOrder.Box = JsonConvert.DeserializeObject<Box>(response.Body);

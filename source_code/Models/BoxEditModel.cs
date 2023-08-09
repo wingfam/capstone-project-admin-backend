@@ -2,6 +2,6 @@
 {
     public class BoxEditModel
     {
-        public bool isAvailable { get; set; }
+        public int status { get; set; }
     }
 }

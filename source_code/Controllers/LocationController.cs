@@ -39,6 +39,12 @@ namespace DeliverLocation_BE.Controllers
                     }
                 }
 
+                foreach (var item in list)
+                {
+                    response = client.Get("Business/" + item.businessId);
+                    item.Business = JsonConvert.DeserializeObject<Business>(response.Body);
+                }
+
                 var json = JsonConvert.SerializeObject(list, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
                 return Content(json, "application/json");
             } catch (Exception ex)
@@ -77,7 +83,7 @@ namespace DeliverLocation_BE.Controllers
             {
                 client = new FireSharp.FirebaseClient(config);
 
-                var l = new Location(model.name, model.address, model.status);
+                var l = new Location(model.name, model.address, model.businessId, model.status);
 
                 PushResponse pushResponse = client.Push("Location/", l);
                 l.id = pushResponse.Result.name;
@@ -104,37 +110,47 @@ namespace DeliverLocation_BE.Controllers
                 FirebaseResponse response = client.Get("Location/");
                 dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
 
-                    var location = new Location();
-                    if (data != null)
+                var location = new Location();
+                if (data != null)
+                {
+                    foreach (var item in data)
                     {
-                        foreach (var item in data)
+                        var l = JsonConvert.DeserializeObject<Location>(((JProperty)item).Value.ToJson());
+                        if (l.id == id)
                         {
-                            var value = JsonConvert.DeserializeObject<Location>(((JProperty)item).Value.ToJson());
-                            var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
-                            var l = JsonConvert.DeserializeObject<Location>(jvalue);
-                            if (l.id == id)
-                            {
-                                location = l;
-                            }
+                            location = l;
                         }
                     }
-
-                    location.name = model.name;
-                    location.address = model.address;
-                    location.status = model.status;
-
-                    response = await client.UpdateAsync("Location/" + location.id, location);
-
-                    var result = new { errCode = 0, errMessage = "Success" };
-                    var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
-
-                    return Content(json, "application/json");
-                } catch (Exception ex)
-                {
-                    var result = new { errCode = 1, errMessage = ex.Message };
-                    var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
-                    return Content(json, "application/json");
                 }
+                if (model.name != null)
+                {
+                    location.name = model.name;
+                }
+                if (model.address  != null)
+                {
+                    location.address = model.address;
+                }   
+                if(model.businessId != null)
+                {
+                    location.businessId = model.businessId;
+                }
+                if(model.status != null)
+                {
+                    location.status = model.status;
+                }
+
+                response = await client.UpdateAsync("Location/" + location.id, location);
+
+                var result = new { errCode = 0, errMessage = "Success" };
+                var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+
+                return Content(json, "application/json");
+            } catch (Exception ex)
+            {
+                var result = new { errCode = 1, errMessage = ex.Message };
+                var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                return Content(json, "application/json");
+            }
         }
     }
 }

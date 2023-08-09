@@ -136,7 +136,7 @@ namespace DeliverBox_BE.Controllers
                 client = new FireSharp.FirebaseClient(config);
                 FirebaseResponse response = client.Get("Box");
 
-                var input = new Box(model.name, model.isStore, model.isAvailable, model.cabinetId);
+                var input = new Box(model.name, model.height, model.weight, model.status, model.cabinetId);
 
                 dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
                 if (data != null)
@@ -183,16 +183,14 @@ namespace DeliverBox_BE.Controllers
                 {
                     foreach (var item in data)
                     {
-                        var value = JsonConvert.DeserializeObject<Box>(((JProperty)item).Value.ToJson());
-                        var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
-                        var l = JsonConvert.DeserializeObject<Box>(jvalue);
+                        var l = JsonConvert.DeserializeObject<Box>(((JProperty)item).Value.ToJson());
                         if (l.id == id)
                         {
                             box = l;
                         }
                     }
                 }
-                box.isAvailable = model.isAvailable;
+                box.status = model.status;
 
                 response = await client.UpdateAsync("Box/" + box.id, box);
 
@@ -230,7 +228,7 @@ namespace DeliverBox_BE.Controllers
                         }
                     }
                 }
-                box.isAvailable = false; //Delede = Change status to false
+                box.status = 0; //Delede = Change status to false
                 response = await client.UpdateAsync("Box/" + box.id, box);
 
                 var result = new { errCode = 0, errMessage = "Success" };
