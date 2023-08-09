@@ -11,9 +11,9 @@ using System.Collections.Generic;
 
 namespace MailBoxTest.Controllers
 {
-    [Route("api/v1/bussiness")]
+    [Route("api/v1/business")]
     [ApiController]
-    public class BussinessController : Controller
+    public class BusinessController : Controller
     {
         IFirebaseConfig config = new FirebaseConfig
         {
@@ -23,19 +23,19 @@ namespace MailBoxTest.Controllers
         IFirebaseClient client;
 
         [HttpGet(template:"get-all")]
-        public ActionResult GetBussinesss()
+        public ActionResult GetBusinesss()
         {
             try
             {
                 client = new FireSharp.FirebaseClient(config);
-                FirebaseResponse response = client.Get("Bussiness");
+                FirebaseResponse response = client.Get("Business");
                 dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
-                var list = new List<Bussiness>();
+                var list = new List<Business>();
                 if (data != null)
                 {
                     foreach (var item in data)
                     {
-                        list.Add(JsonConvert.DeserializeObject<Bussiness>(((JProperty)item).Value.ToString()));
+                        list.Add(JsonConvert.DeserializeObject<Business>(((JProperty)item).Value.ToString()));
                     }
                 }
 
@@ -52,13 +52,13 @@ namespace MailBoxTest.Controllers
         }
 
         [HttpGet(template: "search")]
-        public ActionResult GetBussiness(string id)
+        public ActionResult GetBusiness(string id)
         {
             try
             {
                 client = new FireSharp.FirebaseClient(config);
-                FirebaseResponse response = client.Get("Bussiness/" + id);
-                var result = JsonConvert.DeserializeObject<Bussiness>(response.Body);
+                FirebaseResponse response = client.Get("Business/" + id);
+                var result = JsonConvert.DeserializeObject<Business>(response.Body);
 
                 var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
 
@@ -72,8 +72,8 @@ namespace MailBoxTest.Controllers
             }
         }
 
-        [HttpGet(template: "get-bussiness-by-location")]
-        public ActionResult GetBussinessviaLocation(string locationId)
+        [HttpGet(template: "get-business-by-location")]
+        public ActionResult GetBusinessviaLocation(string locationId)
         {
             try
             {
@@ -81,8 +81,8 @@ namespace MailBoxTest.Controllers
                 FirebaseResponse response = client.Get("Location/" + locationId);
                 var location = JsonConvert.DeserializeObject<Location>(response.Body);
 
-                response = client.Get("Bussiness/" + location.bussinessId);
-                var result = JsonConvert.DeserializeObject<Bussiness> (response.Body);
+                response = client.Get("Business/" + location.businessId);
+                var result = JsonConvert.DeserializeObject<Business> (response.Body);
 
                 var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
 
@@ -96,19 +96,19 @@ namespace MailBoxTest.Controllers
             }
         }
 
-        [HttpPost(template:"add-bussiness")]
-        public ActionResult AddBussiness([FromBody]BussinessAddModel model)
+        [HttpPost(template:"add-business")]
+        public ActionResult AddBusiness([FromBody] BusinessAddModel model)
         {
             try
             {
                 client = new FireSharp.FirebaseClient(config);
                 //Creating pushing object and put in var 
-                Bussiness r = new Bussiness(model.name, model.address, model.phone, 1);
+                Business r = new Business(model.name, model.address, model.phone, 1);
                 var data = r;
 
-                PushResponse response = client.Push("Bussiness/", data);
+                PushResponse response = client.Push("Business/", data);
                 data.id = response.Result.name;
-                SetResponse setResponse = client.Set("Bussiness/" + data.id, data);
+                SetResponse setResponse = client.Set("Business/" + data.id, data);
 
                 var result = new { errCode = 0, errMessage = "Success" };
                 var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
@@ -124,18 +124,18 @@ namespace MailBoxTest.Controllers
         }
 
         [HttpPut(template:"update")]
-        public async Task<ActionResult> UpdateBussiness (string id, [FromBody]BussinessUpdateModel model)
+        public async Task<ActionResult> UpdateBusiness (string id, [FromBody] BusinessUpdateModel model)
         {
             try
             {
                 client = new FireSharp.FirebaseClient(config);
-                FirebaseResponse response = client.Get("Bussiness/" + id);
+                FirebaseResponse response = client.Get("Business/" + id);
 
-                var bussiness = JsonConvert.DeserializeObject<Bussiness>(response.Body);
+                var business = JsonConvert.DeserializeObject<Business>(response.Body);
 
-                bussiness.status = model.status;
+                business.status = model.status;
 
-                response = await client.UpdateAsync("Bussiness/" + bussiness.id, bussiness);
+                response = await client.UpdateAsync("Business/" + business.id, business);
 
                 var result = new { errCode = 0, errMessage = "Success" };
                 var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
@@ -150,19 +150,19 @@ namespace MailBoxTest.Controllers
         }
 
         [HttpDelete(template: "delete")]
-        public async Task<ActionResult> DeleteBussiness(string id)
+        public async Task<ActionResult> DeleteBusiness(string id)
         {
             client = new FireSharp.FirebaseClient(config);
 
-            FirebaseResponse response = client.Get("Bussiness/" + id);
+            FirebaseResponse response = client.Get("Business/" + id);
             dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
 
             try
             {
-                var bussiness = JsonConvert.DeserializeObject<dynamic>(response.Body);
+                var business = JsonConvert.DeserializeObject<dynamic>(response.Body);
 
-                bussiness.isAvaiable = false; //Delede = Change status to false
-                response = await client.UpdateAsync("Bussiness/" + bussiness.id, bussiness);
+                business.isAvaiable = false; //Delede = Change status to false
+                response = await client.UpdateAsync("Business/" + business.id, business);
 
                 var result = new { errCode = 0, errMessage = "Success" };
                 var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });

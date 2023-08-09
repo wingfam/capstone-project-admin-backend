@@ -8,13 +8,13 @@ namespace DeliverBox_BE.Objects
         {
         }
 
-        public Cabinet(string name, DateTime createDate, int totalBox, string locationId, string bussinessId, int status, string? mastercode, int? mastercodeStatus)
+        public Cabinet(string name, DateTime createDate, int totalBox, string locationId, string businessId, int status, string? mastercode, int? mastercodeStatus)
         {
             this.name = name;
             this.addDate = createDate;
             this.totalBox = totalBox;
             this.locationId = locationId;
-            this.bussinessId = bussinessId;
+            this.businessId = businessId;
             this.status = status;
             this.masterCode = mastercode;
             this.masterCodeStatus = masterCodeStatus;
@@ -25,7 +25,7 @@ namespace DeliverBox_BE.Objects
         public DateTime addDate { get; set; }
         public int totalBox { get; set; }
         public string? locationId { get; set; }
-        public string? bussinessId { get; set; }
+        public string? businessId { get; set; }
         public int? status { get; set; }
         public string? masterCode { get; set; }
         public string? masterCodeStatus { get; set; }
@@ -33,6 +33,6 @@ namespace DeliverBox_BE.Objects
         [JsonIgnore]
         public virtual Location? Location { get; set; }
         [JsonIgnore]
-        public virtual Bussiness Bussiness { get; set; }
+        public virtual Business Business { get; set; }
     }
 }

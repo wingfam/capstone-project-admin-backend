@@ -41,8 +41,8 @@ namespace DeliverLocation_BE.Controllers
 
                 foreach (var item in list)
                 {
-                    response = client.Get("Bussiness/" + item.bussinessId);
-                    item.Bussiness = JsonConvert.DeserializeObject<Bussiness>(response.Body);
+                    response = client.Get("Business/" + item.businessId);
+                    item.Business = JsonConvert.DeserializeObject<Business>(response.Body);
                 }
 
                 var json = JsonConvert.SerializeObject(list, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
@@ -83,7 +83,7 @@ namespace DeliverLocation_BE.Controllers
             {
                 client = new FireSharp.FirebaseClient(config);
 
-                var l = new Location(model.name, model.address, model.status);
+                var l = new Location(model.name, model.address, model.businessId, model.status);
 
                 PushResponse pushResponse = client.Push("Location/", l);
                 l.id = pushResponse.Result.name;
@@ -130,9 +130,9 @@ namespace DeliverLocation_BE.Controllers
                 {
                     location.address = model.address;
                 }   
-                if(model.bussinessId != null)
+                if(model.businessId != null)
                 {
-                    location.bussinessId = model.bussinessId;
+                    location.businessId = model.businessId;
                 }
                 if(model.status != null)
                 {

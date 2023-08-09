@@ -44,15 +44,15 @@ namespace DeliverCabinet_BE.Controllers
                 //Search for Location
                 foreach (var item in list)
                 {
-                    response = client.Get("Location/" + item.bussinessId);
-                    item.Bussiness = JsonConvert.DeserializeObject<Bussiness>(response.Body);
+                    response = client.Get("Location/" + item.businessId);
+                    item.Business = JsonConvert.DeserializeObject<Business>(response.Body);
                 }
 
-                //Search for bussiness
+                //Search for business
                 foreach (var item in list)
                 {
-                    response = client.Get("Bussiness/" + item.bussinessId);
-                    item.Bussiness = JsonConvert.DeserializeObject<Bussiness>(response.Body);
+                    response = client.Get("Business/" + item.businessId);
+                    item.Business = JsonConvert.DeserializeObject<Business>(response.Body);
                 }
                 var json = JsonConvert.SerializeObject(list, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
                 return Content(json, "application/json");
@@ -77,8 +77,8 @@ namespace DeliverCabinet_BE.Controllers
                 response = client.Get("Location/" + result.locationId);
                 result.Location = JsonConvert.DeserializeObject<Location>(response.Body);
 
-                response = client.Get("Bussiness/" + result.bussinessId);
-                result.Bussiness = JsonConvert.DeserializeObject<Bussiness>(response.Body);
+                response = client.Get("Business/" + result.businessId);
+                result.Business = JsonConvert.DeserializeObject<Business>(response.Body);
 
                 var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
                 return Content(json, "application/json");
@@ -117,11 +117,11 @@ namespace DeliverCabinet_BE.Controllers
                     response = client.Get("Location/" + cabi.locationId);
                     cabi.Location = JsonConvert.DeserializeObject<Location>(response.Body);
                 }
-                //Search for bussiness
+                //Search for business
                 foreach (var item in result)
                 {
-                    response = client.Get("Bussiness/" + item.bussinessId);
-                    item.Bussiness = JsonConvert.DeserializeObject<Bussiness>(response.Body);
+                    response = client.Get("Business/" + item.businessId);
+                    item.Business = JsonConvert.DeserializeObject<Business>(response.Body);
                 }
                 var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
 
@@ -143,7 +143,7 @@ namespace DeliverCabinet_BE.Controllers
             {
                 client = new FireSharp.FirebaseClient(config);
 
-                var c = new Cabinet(model.name, createDate, 0, model.locationId, model.bussinessId, 0, null, null);
+                var c = new Cabinet(model.name, createDate, 0, model.locationId, model.businessId, 0, null, null);
 
                 PushResponse pushResponse = client.Push("Cabinet/", c);
                 c.id = pushResponse.Result.name;
@@ -176,7 +176,7 @@ namespace DeliverCabinet_BE.Controllers
                 }
                 
                 cabinet.locationId = model.locationId;
-                cabinet.bussinessId = model.bussinessId;
+                cabinet.businessId = model.businessId;
                 cabinet.status = model.status;
                 if(model.mastercode != null)
                 {
