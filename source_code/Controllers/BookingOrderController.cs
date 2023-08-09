@@ -44,7 +44,7 @@ namespace DeliverBox_BE.Controllers
                 //Include Resident data
                 foreach (var order in list)
                 {
-                    response = client.Get("Resident/" + order.busnessId);
+                    response = client.Get("Business/" + order.busnessId);
                     order.Business = JsonConvert.DeserializeObject<Business>(response.Body);
                 }
 
@@ -109,7 +109,7 @@ namespace DeliverBox_BE.Controllers
                     //Include Resident data
                     foreach (var order in list)
                     {
-                        response = client.Get("Resident/" + order.busnessId);
+                        response = client.Get("Business/" + order.busnessId);
                         order.Business = JsonConvert.DeserializeObject<Business>(response.Body);
                     }
 
