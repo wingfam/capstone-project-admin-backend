@@ -33,7 +33,6 @@ namespace DeliverCabinet_BE.Controllers
                 dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
 
                 var list = new List<Cabinet>();
-                var temp = new Cabinet();
                 if (data != null)
                 {
                     foreach (var item in data)
@@ -78,7 +77,7 @@ namespace DeliverCabinet_BE.Controllers
                 response = client.Get("Location/" + result.locationId);
                 result.Location = JsonConvert.DeserializeObject<Location>(response.Body);
 
-                response = client.Get("Location/" + result.bussinessId);
+                response = client.Get("Bussiness/" + result.bussinessId);
                 result.Bussiness = JsonConvert.DeserializeObject<Bussiness>(response.Body);
 
                 var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
@@ -171,7 +170,11 @@ namespace DeliverCabinet_BE.Controllers
                 FirebaseResponse response = client.Get("Cabinet/" + id);
                 var cabinet = JsonConvert.DeserializeObject<Cabinet>(response.Body);
 
-                cabinet.name = model.name;
+                if(model.name != null)
+                {
+                    cabinet.name = model.name;
+                }
+                
                 cabinet.locationId = model.locationId;
                 cabinet.bussinessId = model.bussinessId;
                 cabinet.status = model.status;
@@ -203,7 +206,7 @@ namespace DeliverCabinet_BE.Controllers
 
                     foreach (var box in list)
                     {
-                        box.isAvailable = true;
+                        box.status = 1;
                         response = client.Update("Box/" + box.id, box); //Update to firebase
                     }
                 }
@@ -249,7 +252,7 @@ namespace DeliverCabinet_BE.Controllers
 
                 foreach (var box in list)
                 {
-                    box.isAvailable = false;
+                    box.status = 1;
                     response = client.Update("Box/" + box.id, box); //Update to firebase
                 }
 

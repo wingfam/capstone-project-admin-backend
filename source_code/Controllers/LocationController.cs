@@ -110,18 +110,18 @@ namespace DeliverLocation_BE.Controllers
                 FirebaseResponse response = client.Get("Location/");
                 dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
 
-                    var location = new Location();
-                    if (data != null)
+                var location = new Location();
+                if (data != null)
+                {
+                    foreach (var item in data)
                     {
-                        foreach (var item in data)
+                        var l = JsonConvert.DeserializeObject<Location>(((JProperty)item).Value.ToJson());
+                        if (l.id == id)
                         {
-                            var l = JsonConvert.DeserializeObject<Location>(((JProperty)item).Value.ToJson());
-                            if (l.id == id)
-                            {
-                                location = l;
-                            }
+                            location = l;
                         }
                     }
+                }
                 if (model.name != null)
                 {
                     location.name = model.name;
@@ -138,6 +138,7 @@ namespace DeliverLocation_BE.Controllers
                 {
                     location.status = model.status;
                 }
+
                 response = await client.UpdateAsync("Location/" + location.id, location);
 
                 var result = new { errCode = 0, errMessage = "Success" };
