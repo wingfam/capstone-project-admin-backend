@@ -103,7 +103,7 @@ namespace MailBoxTest.Controllers
             {
                 client = new FireSharp.FirebaseClient(config);
                 //Creating pushing object and put in var 
-                Business r = new Business(model.name, model.address, model.phone, 1);
+                Business r = new Business(model.businessName, model.address, model.phone, 1);
                 var data = r;
 
                 PushResponse response = client.Push("Business/", data);

@@ -7,15 +7,10 @@ namespace DeliverBox_BE.Objects;
 public partial class BookingCode
 {
     public string id { get; set; } = null!;
-
-    public string bookingCodeId { get; set; } = null!;
-
-    public string bcodeName { get; set; } = null!;
-
-    public DateTime? bcodeValidDate { get; set; }
-
+    public string bcode { get; set; } = null!;
+    public DateTime? validDate { get; set; }
     public string? bookingId { get; set; }
 
     [JsonIgnore]
-    public virtual BookingOrder? Booking { get; set; }
+    public virtual BookingOrder? BookingOrder { get; set; }
 }
