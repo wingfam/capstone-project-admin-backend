@@ -17,13 +17,13 @@ namespace DeliverBox_BE.Controllers
         };
         IFirebaseClient client;
 
-        [HttpGet(template: "get-total-resident")]
+        [HttpGet(template: "get-total-business")]
         public ActionResult GetTotalResident ()
         {
             try
             {
                 client = new FireSharp.FirebaseClient (config);
-                FirebaseResponse response = client.Get("Resident");
+                FirebaseResponse response = client.Get("Business");
 
                 int count = 0;
                 dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
@@ -31,7 +31,7 @@ namespace DeliverBox_BE.Controllers
                 {
                     count ++; //Count the number  of resident in the data list
                 }
-                var result = new {obj = "Total Resident", count = count};
+                var result = new {obj = "Total Business", count = count};
 
                 var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
                 return Content(json, "application/json");

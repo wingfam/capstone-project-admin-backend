@@ -64,6 +64,9 @@ namespace DeliverLocation_BE.Controllers
                 FirebaseResponse response = client.Get("Location/" + id);
                 var result = JsonConvert.DeserializeObject<Location>(response.Body);
 
+                response = client.Get("Business/" + result.businessId);
+                result.Business = JsonConvert.DeserializeObject<Business>(response.Body);
+
                 var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
 
                 //Json convert

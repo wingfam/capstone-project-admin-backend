@@ -44,7 +44,7 @@ namespace DeliverCabinet_BE.Controllers
                 //Search for Location
                 foreach (var item in list)
                 {
-                    response = client.Get("Location/" + item.businessId);
+                    response = client.Get("Location/" + item.locationId);
                     item.Business = JsonConvert.DeserializeObject<Business>(response.Body);
                 }
 
@@ -172,7 +172,7 @@ namespace DeliverCabinet_BE.Controllers
 
                 if(model.name != null)
                 {
-                    cabinet.name = model.name;
+                    cabinet.nameCabinet = model.name;
                 }
                 
                 cabinet.locationId = model.locationId;
