@@ -2,7 +2,7 @@
 {
     public class CabinetAddModel
     {
-        public string name { get; set; }
+        public string nameCabinet { get; set; }
         public string locationId { get; set; }
         public string businessId { get; set; }
     }

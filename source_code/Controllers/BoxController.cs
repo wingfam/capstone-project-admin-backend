@@ -136,7 +136,7 @@ namespace DeliverBox_BE.Controllers
                 client = new FireSharp.FirebaseClient(config);
                 FirebaseResponse response = client.Get("Box");
 
-                var input = new Box(model.name, model.height, model.weight, model.status, model.cabinetId);
+                var input = new Box(model.nameBox, model.height, model.weight, model.status, model.cabinetId);
 
                 dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
                 if (data != null)
@@ -146,7 +146,7 @@ namespace DeliverBox_BE.Controllers
                         var value = JsonConvert.DeserializeObject<Box>(((JProperty)item).Value.ToJson());
                         var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
                         var box = JsonConvert.DeserializeObject<Box>(jvalue);
-                        if (box.nameBox.ToLower() == model.name.ToLower())
+                        if (box.nameBox.ToLower() == model.nameBox.ToLower())
                         {
                             var errResult = new { errCode = 1, errMessage = "Invalid Box Name" };
                             return Content(JsonConvert.SerializeObject(errResult, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None }), "application/json");

@@ -7,14 +7,14 @@ namespace DeliverBox_BE.Objects
         public Location() { }
         public Location(string name, string address, string businessId, int status)
         {
-            this.name = name;
+            this.nameLocation = name;
             this.address = address;
             this.businessId = businessId;
             this.status = status;
         }
 
         public string? id { get; set; } = null;
-        public string? name { get; set; }
+        public string? nameLocation { get; set; }
         public string? address { get; set; } = null;
         public string? businessId { get; set; }
         public int? status { get; set; }

@@ -2,7 +2,7 @@
 {
     public class BusinessAddModel
     {
-        public string? name { get; set; }
+        public string? businessName { get; set; }
         public string? address { get; set; }
         public string? phone { get; set; }
     }

@@ -60,7 +60,7 @@ namespace DeliverBox_BE.Controllers
         private User Authenticate(UserLoginModel userLogin)
         {
             var currentUser = UserConstants.Users.FirstOrDefault(x => x.Phone.ToLower() ==
-                userLogin.Phone.ToLower() && x.Password == userLogin.Password);
+                userLogin.phone.ToLower() && x.Password == userLogin.password);
             if (currentUser != null)
             {
                 return currentUser;

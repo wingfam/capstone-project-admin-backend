@@ -86,7 +86,7 @@ namespace DeliverLocation_BE.Controllers
             {
                 client = new FireSharp.FirebaseClient(config);
 
-                var l = new Location(model.name, model.address, model.businessId, model.status);
+                var l = new Location(model.nameLocation, model.address, model.businessId, model.status);
 
                 PushResponse pushResponse = client.Push("Location/", l);
                 l.id = pushResponse.Result.name;
@@ -125,9 +125,9 @@ namespace DeliverLocation_BE.Controllers
                         }
                     }
                 }
-                if (model.name != null)
+                if (model.nameLocation != null)
                 {
-                    location.name = model.name;
+                    location.nameLocation = model.nameLocation;
                 }
                 if (model.address  != null)
                 {

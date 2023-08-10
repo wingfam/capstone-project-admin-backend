@@ -143,7 +143,7 @@ namespace DeliverCabinet_BE.Controllers
             {
                 client = new FireSharp.FirebaseClient(config);
 
-                var c = new Cabinet(model.name, createDate, 0, model.locationId, model.businessId, 0, null, null);
+                var c = new Cabinet(model.nameCabinet, createDate, 0, model.locationId, model.businessId, 0, null, null);
 
                 PushResponse pushResponse = client.Push("Cabinet/", c);
                 c.id = pushResponse.Result.name;
@@ -170,21 +170,21 @@ namespace DeliverCabinet_BE.Controllers
                 FirebaseResponse response = client.Get("Cabinet/" + id);
                 var cabinet = JsonConvert.DeserializeObject<Cabinet>(response.Body);
 
-                if(model.name != null)
+                if(model.nameCabinet != null)
                 {
-                    cabinet.nameCabinet = model.name;
+                    cabinet.nameCabinet = model.nameCabinet;
                 }
                 
                 cabinet.locationId = model.locationId;
                 cabinet.businessId = model.businessId;
                 cabinet.status = model.status;
-                if(model.mastercode != null)
+                if(model.masterCode != null)
                 {
-                    cabinet.masterCode = model.mastercode;
+                    cabinet.masterCode = model.masterCode;
                 }
-                if(model.mastercodeStatus != null)
+                if(model.masterCodeStatus != null)
                 {
-                    cabinet.masterCodeStatus = model.mastercodeStatus;
+                    cabinet.masterCodeStatus = model.masterCodeStatus;
                 }
 
                 response = client.Update("Cabinet/" + cabinet.id, cabinet);
