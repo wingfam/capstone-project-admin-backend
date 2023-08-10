@@ -45,7 +45,7 @@ namespace DeliverCabinet_BE.Controllers
                 foreach (var item in list)
                 {
                     response = client.Get("Location/" + item.locationId);
-                    item.Business = JsonConvert.DeserializeObject<Business>(response.Body);
+                    item.Location = JsonConvert.DeserializeObject<Location>(response.Body);
                 }
 
                 //Search for business
