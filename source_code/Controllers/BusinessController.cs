@@ -132,7 +132,18 @@ namespace MailBoxTest.Controllers
                 FirebaseResponse response = client.Get("Business/" + id);
 
                 var business = JsonConvert.DeserializeObject<Business>(response.Body);
-
+                if(model.businessName != null)
+                {
+                    business.businessName = model.businessName;
+                }
+                if(model.address != null)
+                {
+                    business.address = model.address;
+                }
+                if(model.phone != null)
+                {
+                    business.phone = model.phone;
+                }
                 business.status = model.status;
 
                 response = await client.UpdateAsync("Business/" + business.id, business);

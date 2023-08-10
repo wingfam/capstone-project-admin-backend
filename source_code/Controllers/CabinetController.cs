@@ -135,6 +135,52 @@ namespace DeliverCabinet_BE.Controllers
             }
         }
 
+        [HttpGet(template: "get-cabinet-by-business")]
+        public ActionResult GetCabinetviaBusiness(string businessId)
+        {
+            try
+            {
+                client = new FireSharp.FirebaseClient(config);
+                FirebaseResponse response = client.Get("Cabinet");
+                dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+
+                var result = new List<Cabinet>();
+                if (data != null)
+                {
+                    foreach (var item in data)
+                    {
+                        var c = JsonConvert.DeserializeObject<Cabinet>(((JProperty)item).Value.ToJson());
+                        if (c.businessId == businessId)
+                        {
+                            result.Add(c);
+                        }
+                    }
+                }
+
+                foreach (var cabi in result) //Loop in list
+                {
+                    response = client.Get("Location/" + cabi.locationId);
+                    cabi.Location = JsonConvert.DeserializeObject<Location>(response.Body);
+                }
+                //Search for business
+                foreach (var item in result)
+                {
+                    response = client.Get("Business/" + item.businessId);
+                    item.Business = JsonConvert.DeserializeObject<Business>(response.Body);
+                }
+                var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+
+                //Json convert
+                return Content(json, "application/json");
+            }
+            catch (Exception ex)
+            {
+                var result = new { errCode = 1, errMessage = ex.Message };
+                var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                return Content(json, "application/json");
+            }
+        }
+
         [HttpPost(template: "add-cabinet")]
         public ActionResult AddWCabinet([FromBody] CabinetAddModel model)
         {
