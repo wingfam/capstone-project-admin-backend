@@ -10,7 +10,7 @@ namespace DeliverBox_BE.Objects
 
         public Cabinet(string name, DateTime createDate, int totalBox, string locationId, string businessId, int status, string? mastercode, int? mastercodeStatus)
         {
-            this.name = name;
+            this.nameCabinet = name;
             this.addDate = createDate;
             this.totalBox = totalBox;
             this.locationId = locationId;
@@ -21,7 +21,7 @@ namespace DeliverBox_BE.Objects
         }
 
         public string? id { get; set; } = null;
-        public string? name { get; set; }
+        public string? nameCabinet { get; set; }
         public DateTime addDate { get; set; }
         public int totalBox { get; set; }
         public string? locationId { get; set; }
