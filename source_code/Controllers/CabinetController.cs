@@ -283,7 +283,7 @@ namespace DeliverCabinet_BE.Controllers
                 cabinet.status = 0; //Delede = Change status to false
                 response = client.Update("Cabinet/" + cabinet.id, cabinet);
 
-                //Set Box to false
+                //Set Box to unavaiable
                 response = client.Get("Box");
                 dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
 
@@ -298,7 +298,7 @@ namespace DeliverCabinet_BE.Controllers
 
                 foreach (var box in list)
                 {
-                    box.status = 1;
+                    box.status = 0;
                     response = client.Update("Box/" + box.id, box); //Update to firebase
                 }
 
