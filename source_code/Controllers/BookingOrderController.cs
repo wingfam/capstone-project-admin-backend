@@ -68,7 +68,7 @@ namespace DeliverBox_BE.Controllers
         }
 
         [HttpGet(template: "get-order-by-resident-and-box")]
-        public ActionResult GetOrderByResidentAndBox(string? residentId, string? boxId)
+        public ActionResult GetOrderByResidentAndBox(string? busnessId, string? boxId)
         {
             try
             {
@@ -82,10 +82,10 @@ namespace DeliverBox_BE.Controllers
                     foreach (var item in data)
                     {
                         temp = JsonConvert.DeserializeObject<BookingOrder>(((JProperty)item).Value.ToString());
-                        if (residentId == null && boxId == null)
+                        if (busnessId == null && boxId == null)
                         {
                            list.Add(temp);
-                        } else if (residentId == null)
+                        } else if (busnessId == null)
                         {
                             if(temp.boxId == boxId)
                             {
@@ -93,13 +93,13 @@ namespace DeliverBox_BE.Controllers
                             }
                         } else if (boxId == null)
                         {
-                            if(temp.busnessId == residentId)
+                            if(temp.busnessId == busnessId)
                             {
                                 list.Add(temp);
                             }
                         } else
                         {
-                            if (temp.busnessId == residentId && temp.boxId == boxId)
+                            if (temp.busnessId == busnessId && temp.boxId == boxId)
                             {
                                 list.Add(temp);
                             }
@@ -127,6 +127,72 @@ namespace DeliverBox_BE.Controllers
                 return Content(json, "application/json");
             }
             catch (Exception ex)
+            {
+                var result = new { errCode = 1, errMessage = ex.Message };
+                var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                return Content(json, "application/json");
+            }
+        }
+
+        [HttpGet(template: "get-oder-by-cabinet-business-createDate")]
+        public ActionResult GetOrderViaCabinetBusniessCreateDate (string? boxId, string? bussnessId, DateTime? createDate)
+        {
+            try
+            {
+                client = new FireSharp.FirebaseClient(config);
+                FirebaseResponse response = client.Get("BookingOrder");
+                dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+                var list = new List<BookingOrder>();
+                var temp = new BookingOrder();
+                if(data != null)
+                {
+                    foreach (var item in data)
+                    {
+                        temp = JsonConvert.DeserializeObject<BookingOrder>(((JProperty)item).Value.ToString());
+                        if (boxId == null && bussnessId == null)
+                        {
+                           list.Add(temp);
+                        } else if (boxId == null)
+                        {
+                            if(temp.busnessId == bussnessId)
+                            {
+                                list.Add(temp);
+                            }
+                        } else if (bussnessId == null)
+                        {
+                            if(temp.boxId == boxId)
+                            {
+                                list.Add(temp);
+                            }
+                        } else
+                        {
+                            if (temp.busnessId == bussnessId && temp.boxId == boxId)
+                            {
+                                list.Add(temp);
+                            }
+                        }
+                    }
+
+                    //Include Resident data
+                    foreach (var order in list)
+                    {
+                        response = client.Get("Business/" + order.busnessId);
+                        order.Business = JsonConvert.DeserializeObject<Business>(response.Body);
+                    }
+
+                    //Include Box data
+                    foreach (var order in list)
+                    {
+                        response = client.Get("Box/" + order.boxId);
+                        order.Box = JsonConvert.DeserializeObject<Box>(response.Body);
+                        response = client.Get("Cabinet/" + order.Box.cabinetId);
+                        order.Box.Cabinet = JsonConvert.DeserializeObject<Cabinet>(response.Body);
+                    }
+                }
+
+                var json = JsonConvert.SerializeObject(list, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                return Content(json, "application/json");
+            } catch (Exception ex)
             {
                 var result = new { errCode = 1, errMessage = ex.Message };
                 var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
