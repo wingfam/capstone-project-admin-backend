@@ -44,7 +44,7 @@ namespace DeliverBox_BE.Controllers
                 //Include Resident data
                 foreach (var order in list)
                 {
-                    response = client.Get("Business/" + order.busnessId);
+                    response = client.Get("Business/" + order.businessId);
                     order.Business = JsonConvert.DeserializeObject<Business>(response.Body);
                 }
 
@@ -93,13 +93,13 @@ namespace DeliverBox_BE.Controllers
                             }
                         } else if (boxId == null)
                         {
-                            if(temp.busnessId == busnessId)
+                            if(temp.businessId == busnessId)
                             {
                                 list.Add(temp);
                             }
                         } else
                         {
-                            if (temp.busnessId == busnessId && temp.boxId == boxId)
+                            if (temp.businessId == busnessId && temp.boxId == boxId)
                             {
                                 list.Add(temp);
                             }
@@ -109,7 +109,7 @@ namespace DeliverBox_BE.Controllers
                     //Include Resident data
                     foreach (var order in list)
                     {
-                        response = client.Get("Business/" + order.busnessId);
+                        response = client.Get("Business/" + order.businessId);
                         order.Business = JsonConvert.DeserializeObject<Business>(response.Body);
                     }
 
@@ -135,7 +135,7 @@ namespace DeliverBox_BE.Controllers
         }
 
         [HttpGet(template: "get-oder-by-cabinet-business-createDate")]
-        public ActionResult GetOrderViaCabinetBusniessCreateDate (string? boxId, string? bussnessId, DateTime? createDate)
+        public ActionResult GetOrderViaCabinetBusniessCreateDate (string? boxId, string? bussnessId, DateTime? createDateStart, DateTime? createDateEnd)
         {
             try
             {
@@ -154,7 +154,7 @@ namespace DeliverBox_BE.Controllers
                            list.Add(temp);
                         } else if (boxId == null)
                         {
-                            if(temp.busnessId == bussnessId)
+                            if(temp.businessId == bussnessId)
                             {
                                 list.Add(temp);
                             }
@@ -166,7 +166,7 @@ namespace DeliverBox_BE.Controllers
                             }
                         } else
                         {
-                            if (temp.busnessId == bussnessId && temp.boxId == boxId)
+                            if (temp.businessId == bussnessId && temp.boxId == boxId)
                             {
                                 list.Add(temp);
                             }
@@ -176,7 +176,7 @@ namespace DeliverBox_BE.Controllers
                     //Include Resident data
                     foreach (var order in list)
                     {
-                        response = client.Get("Business/" + order.busnessId);
+                        response = client.Get("Business/" + order.businessId);
                         order.Business = JsonConvert.DeserializeObject<Business>(response.Body);
                     }
 
@@ -209,7 +209,7 @@ namespace DeliverBox_BE.Controllers
                 FirebaseResponse response = client.Get("BookingOrder/" + id);
                 var bookingOrder = JsonConvert.DeserializeObject<BookingOrder>(response.Body);
 
-                response = client.Get("Business/" + bookingOrder.busnessId);
+                response = client.Get("Business/" + bookingOrder.businessId);
                 bookingOrder.Business = JsonConvert.DeserializeObject<Business>(response.Body);
 
                 response = client.Get("Box/" + bookingOrder.boxId);

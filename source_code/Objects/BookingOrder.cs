@@ -11,7 +11,7 @@ public partial class BookingOrder
     public DateTime? createDate { get; set; }
     public DateTime? validDate { get; set; }
     public int? status { get; set; }
-    public string? busnessId { get; set; }
+    public string? businessId { get; set; }
     public string? boxId { get; set; }
     public string? customerId { get; set; }
     public string? unlockCode { get; set; }

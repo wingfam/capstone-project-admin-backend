@@ -7,7 +7,6 @@ using FireSharp.Response;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.Collections.Generic;
 
 namespace DeliverBox_BE.Controllers
 {
@@ -136,7 +135,7 @@ namespace DeliverBox_BE.Controllers
                 client = new FireSharp.FirebaseClient(config);
                 FirebaseResponse response = client.Get("Box");
 
-                var input = new Box(model.nameBox, model.height, model.weight, model.status, model.cabinetId);
+                var input = new Box(model.nameBox, model.status, model.cabinetId);
 
                 dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
                 if (data != null)

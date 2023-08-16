@@ -72,30 +72,6 @@ namespace MailBoxTest.Controllers
             }
         }
 
-        [HttpGet(template: "get-business-by-location")]
-        public ActionResult GetBusinessviaLocation(string locationId)
-        {
-            try
-            {
-                client = new FireSharp.FirebaseClient(config);
-                FirebaseResponse response = client.Get("Location/" + locationId);
-                var location = JsonConvert.DeserializeObject<Location>(response.Body);
-
-                response = client.Get("Business/" + location.businessId);
-                var result = JsonConvert.DeserializeObject<Business> (response.Body);
-
-                var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
-
-                //Json convert
-                return Content(json, "application/json");
-            } catch (Exception ex)
-            {
-                var result = new { errCode = 1, errMessage = ex.Message };
-                var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
-                return Content(json, "application/json");
-            }
-        }
-
         [HttpPost(template:"add-business")]
         public ActionResult AddBusiness([FromBody] BusinessAddModel model)
         {
