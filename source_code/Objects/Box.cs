@@ -11,19 +11,15 @@ public partial class Box
     {
     }
 
-    public Box(string name, int? height, int? width, int? status, string cabinetId)
+    public Box(string name, int? status, string cabinetId)
     {
         this.nameBox = name;
-        this.height = height;
-        this.width = width;
         this.status = status;
         this.cabinetId = cabinetId;
     }
 
     public string? id { get; set; } = null!;
     public string? nameBox { get; set; }
-    public int? height { get; set; }
-    public int? width { get; set; }
     public int? status { get; set; }
     public string? cabinetId { get; set; }
 

@@ -22,7 +22,6 @@ namespace DeliverCabinet_BE.Controllers
         };
         IFirebaseClient client;
 
-
         [HttpGet(template: "get-all")]
         public ActionResult GetAllCabinet ()
         {

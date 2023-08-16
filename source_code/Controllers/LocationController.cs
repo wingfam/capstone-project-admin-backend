@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using DeliverBox_BE.Models;
 using DeliverBox_BE.Objects;
 using FireSharp.Extensions;
+using System.Collections.Generic;
 
 namespace DeliverLocation_BE.Controllers
 {
@@ -72,6 +73,40 @@ namespace DeliverLocation_BE.Controllers
                 //Json convert
                 return Content(json, "application/json");
             } catch(Exception ex)
+            {
+                var result = new { errCode = 1, errMessage = ex.Message };
+                var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                return Content(json, "application/json");
+            }
+        }
+
+        [HttpGet(template: "get-location-by-business")]
+        public ActionResult GetBusinessviaLocation(string businessId)
+        {
+            try
+            {
+                client = new FireSharp.FirebaseClient(config);
+                FirebaseResponse response = client.Get("Location");
+                dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+
+                var result = new List<Location>();
+                if (data != null)
+                {
+                    foreach (var item in data)
+                    {
+                        var l = JsonConvert.DeserializeObject<Location>(((JProperty)item).Value.ToJson());
+                        if (l.businessId == businessId)
+                        {
+                            result.Add(l);
+                        }
+                    }
+                }
+                var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+
+                //Json convert
+                return Content(json, "application/json");
+            }
+            catch (Exception ex)
             {
                 var result = new { errCode = 1, errMessage = ex.Message };
                 var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
