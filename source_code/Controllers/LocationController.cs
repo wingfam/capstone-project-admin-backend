@@ -101,6 +101,13 @@ namespace DeliverLocation_BE.Controllers
                         }
                     }
                 }
+
+                foreach (var item in result)
+                {
+                    response = client.Get("Business/" + item.businessId);
+                    item.Business = JsonConvert.DeserializeObject<Business>(response.Body);
+                }
+
                 var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
 
                 //Json convert
