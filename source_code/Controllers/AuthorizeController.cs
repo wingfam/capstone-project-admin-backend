@@ -1,11 +1,12 @@
 ﻿using DeliverBox_BE.Misc;
 using DeliverBox_BE.Models;
 using DeliverBox_BE.Objects;
+using Firebase.Database;
+using Firebase.Database.Query;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -24,13 +25,14 @@ namespace DeliverBox_BE.Controllers
 
         [AllowAnonymous]
         [HttpPost(template: "user-login")]
-        public ActionResult Login([FromBody] UserLoginModel userModel)
+        public ActionResult Login([FromBody] CustomerLoginModel model)
         {
-            var user = Authenticate(userModel);
+            var user = Authenticate(model);
             if (user != null)
             {
                 var result = new { token = GenerateToken(user) };
                 var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+
                 return Content(json, "application/json");
             }
 
@@ -50,17 +52,16 @@ namespace DeliverBox_BE.Controllers
             var token = new JwtSecurityToken(_config["Jwt:Issuer"],
                 _config["Jwt:Audience"],
                 claims,
-                expires: DateTime.Now.AddMinutes(15),
+                expires: DateTime.Now.AddMinutes(3600),
                 signingCredentials: credentials);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
         //To authenticate user
-        private User Authenticate(UserLoginModel userLogin)
+        private User? Authenticate(CustomerLoginModel model)
         {
-            var currentUser = UserConstants.Users.FirstOrDefault(x => x.Phone.ToLower() ==
-                userLogin.phone.ToLower() && x.Password == userLogin.password);
+            var currentUser = UserConstants.Users.FirstOrDefault(x => x.Phone.Length != 0 && x.Password.Length != 0);
             if (currentUser != null)
             {
                 return currentUser;

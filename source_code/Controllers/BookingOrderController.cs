@@ -149,22 +149,22 @@ namespace DeliverBox_BE.Controllers
                     foreach (var item in data)
                     {
                         temp = JsonConvert.DeserializeObject<BookingOrder>(((JProperty)item).Value.ToString());
-                        if (boxId == null && bussnessId == null)
+                        if (boxId == null && bussnessId == null && temp.createDate > createDateStart && temp.createDate < createDateEnd)
                         {
                            list.Add(temp);
-                        } else if (boxId == null)
+                        } else if (boxId == null && temp.createDate > createDateStart && temp.createDate < createDateEnd)
                         {
                             if(temp.businessId == bussnessId)
                             {
                                 list.Add(temp);
                             }
-                        } else if (bussnessId == null)
+                        } else if (bussnessId == null && temp.createDate > createDateStart && temp.createDate < createDateEnd)
                         {
                             if(temp.boxId == boxId)
                             {
                                 list.Add(temp);
                             }
-                        } else
+                        } else if (temp.createDate > createDateStart && temp.createDate < createDateEnd)
                         {
                             if (temp.businessId == bussnessId && temp.boxId == boxId)
                             {

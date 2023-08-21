@@ -308,3 +308,7 @@ C:\Users\ASUS\Desktop\Admin_BE\capstone-project-admin-backend\source_code\bin\De
 C:\Users\ASUS\Desktop\Admin_BE\capstone-project-admin-backend\source_code\bin\Debug\net6.0\Owin.dll
 C:\Users\ASUS\Desktop\Admin_BE\capstone-project-admin-backend\source_code\bin\Debug\net6.0\BouncyCastle.Crypto.dll
 C:\Users\ASUS\Desktop\Admin_BE\capstone-project-admin-backend\source_code\bin\Debug\net6.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+C:\Users\ASUS\Desktop\Admin_BE\capstone-project-admin-backend\source_code\bin\Debug\net6.0\Firebase.dll
+C:\Users\ASUS\Desktop\Admin_BE\capstone-project-admin-backend\source_code\bin\Debug\net6.0\LiteDB.dll
+C:\Users\ASUS\Desktop\Admin_BE\capstone-project-admin-backend\source_code\bin\Debug\net6.0\System.Reactive.dll
+C:\Users\ASUS\Desktop\Admin_BE\capstone-project-admin-backend\source_code\bin\Debug\net6.0\System.Runtime.InteropServices.WindowsRuntime.dll

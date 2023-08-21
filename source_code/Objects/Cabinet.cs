@@ -28,7 +28,7 @@ namespace DeliverBox_BE.Objects
         public string? businessId { get; set; }
         public int? status { get; set; }
         public string? masterCode { get; set; }
-        public string? masterCodeStatus { get; set; }
+        public int? masterCodeStatus { get; set; }
 
         [JsonIgnore]
         public virtual Location? Location { get; set; }
