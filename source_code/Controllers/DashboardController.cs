@@ -4,6 +4,7 @@ using FireSharp.Interfaces;
 using FireSharp.Response;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 
 namespace DeliverBox_BE.Controllers
@@ -125,22 +126,43 @@ namespace DeliverBox_BE.Controllers
             }
         }
 
-        //public ActionResult GetCharData1 ()
-        //{
-        //    try
-        //    {
-        //        DateTime now = DateTime.Now;
-        //        client = new FireSharp.FirebaseClient(config);
+        [HttpGet(template: "get-line-char")]
+        public ActionResult GetLineCharData()
+        {
+            try
+            {
+                DateTime now = DateTime.Now;
+                client = new FireSharp.FirebaseClient(config);
+                
+                FirebaseResponse response = client.Get("BookingOrder");
+                dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+                int count = 0;
+                BookingOrder temp = new BookingOrder();
+                var result = new List<CharObject>();
+                for (int i = 0; i <= 7; i++)
+                {
+                    now = now.AddDays(-i);
+                    foreach (var item in data)
+                    {
+                        temp = JsonConvert.DeserializeObject<BookingOrder>(((JProperty)item).Value.ToString());
+                        if (temp.createDate.Date == now.Date)
+                        {
+                            count++;
+                        }
+                    }
+                    result.Add(new CharObject(i.ToString() ,now.DayOfWeek.ToString(), count));
+                    count = 0;
+                }
 
-        //        FirebaseResponse response = client.Get("BookingOrder");
-        //        dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        var result = new { errCode = 1, errMessage = ex.Message };
-        //        var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
-        //        return Content(json, "application/json");
-        //    }
-        //}
+                var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                return Content(json, "application/json");
+            }
+            catch (Exception ex)
+            {
+                var result = new { errCode = 1, errMessage = ex.Message };
+                var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                return Content(json, "application/json");
+            }
+        }
     }
 }
