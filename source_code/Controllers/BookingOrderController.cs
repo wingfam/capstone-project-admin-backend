@@ -135,7 +135,7 @@ namespace DeliverBox_BE.Controllers
         }
 
         [HttpGet(template: "get-oder-by-cabinet-business-createDate")]
-        public ActionResult GetOrderViaCabinetBusniessCreateDate (string? boxId, string? businessId, DateTime? createDateStart, DateTime? createDateEnd)
+        public ActionResult GetOrderViaCabinetBusniessCreateDate (string? boxId, string? businessId, string? createDateStart, string? createDateEnd)
         {
             try
             {
@@ -144,27 +144,28 @@ namespace DeliverBox_BE.Controllers
                 dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
                 var list = new List<BookingOrder>();
                 var temp = new BookingOrder();
+
                 if(data != null)
                 {
                     foreach (var item in data)
                     {
                         temp = JsonConvert.DeserializeObject<BookingOrder>(((JProperty)item).Value.ToString());
-                        if (boxId == null && businessId == null && temp.createDate >= createDateStart && temp.createDate <= createDateEnd)
+                        if (boxId == null && businessId == null && temp.createDate >= DateTime.Parse(createDateStart) && temp.createDate <= DateTime.Parse(createDateEnd))
                         {
                            list.Add(temp);
-                        } else if (boxId == null && temp.createDate >= createDateStart && temp.createDate <= createDateEnd)
+                        } else if (boxId == null && temp.createDate >= DateTime.Parse(createDateStart) && temp.createDate <= DateTime.Parse(createDateEnd))
                         {
                             if(temp.businessId == businessId)
                             {
                                 list.Add(temp);
                             }
-                        } else if (businessId == null && temp.createDate >= createDateStart && temp.createDate <= createDateEnd)
+                        } else if (businessId == null && temp.createDate >= DateTime.Parse(createDateStart) && temp.createDate <= DateTime.Parse(createDateEnd))
                         {
                             if(temp.boxId == boxId)
                             {
                                 list.Add(temp);
                             }
-                        } else if (temp.createDate >= createDateStart && temp.createDate <= createDateEnd)
+                        } else if (temp.createDate >= DateTime.Parse(createDateStart) && temp.createDate <= DateTime.Parse(createDateEnd))
                         {
                             if (temp.businessId == businessId && temp.boxId == boxId)
                             {
