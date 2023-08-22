@@ -12,7 +12,7 @@ using System.Collections.Generic;
 
 namespace DeliverBox_BE.Controllers
 {
-    [Route("api/v1/bookingorder")]
+    [Route("api/v1/bookingOrder")]
     [ApiController]
     public class BookingOrderController : Controller
     {

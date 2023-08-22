@@ -8,7 +8,7 @@ namespace DeliverBox_BE.Objects;
 public partial class BookingOrder
 {
     public string id { get; set; } = null!;
-    public DateTime? createDate { get; set; }
+    public DateTime createDate { get; set; }
     public DateTime? validDate { get; set; }
     public int? status { get; set; }
     public string? businessId { get; set; }
