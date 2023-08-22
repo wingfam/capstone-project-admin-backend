@@ -131,7 +131,6 @@ namespace DeliverBox_BE.Controllers
         {
             try
             {
-                DateTime now = DateTime.Now;
                 client = new FireSharp.FirebaseClient(config);
                 
                 FirebaseResponse response = client.Get("BookingOrder");
@@ -139,8 +138,9 @@ namespace DeliverBox_BE.Controllers
                 int count = 0;
                 BookingOrder temp = new BookingOrder();
                 var result = new List<CharObject>();
-                for (int i = 0; i <= 7; i++)
+                for (int i = 0; i < 7; i++)
                 {
+                    DateTime now = DateTime.Now;
                     now = now.AddDays(-i);
                     foreach (var item in data)
                     {
@@ -150,7 +150,7 @@ namespace DeliverBox_BE.Controllers
                             count++;
                         }
                     }
-                    result.Add(new CharObject(i.ToString() ,now.DayOfWeek.ToString(), count));
+                    result.Add(new CharObject(i.ToString() , now.DayOfWeek.ToString(), count));
                     count = 0;
                 }
 
