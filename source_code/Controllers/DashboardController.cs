@@ -150,7 +150,7 @@ namespace DeliverBox_BE.Controllers
                             count++;
                         }
                     }
-                    result.Add(new CharObject(i.ToString() , now.DayOfWeek.ToString(), count));
+                    result.Add(new CharObject(i.ToString() , now.Day + "/" + now.Month, count));
                     count = 0;
                 }
 
