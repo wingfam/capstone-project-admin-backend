@@ -138,10 +138,10 @@ namespace DeliverBox_BE.Controllers
                 int count = 0;
                 BookingOrder temp = new BookingOrder();
                 var result = new List<CharObject>();
-                for (int i = 0; i < 7; i++)
+                for (int i = 7; i > 0; i--)
                 {
                     DateTime now = DateTime.Now;
-                    now = now.AddDays(-i);
+                    now = now.AddDays(-(i - 1));
                     foreach (var item in data)
                     {
                         temp = JsonConvert.DeserializeObject<BookingOrder>(((JProperty)item).Value.ToString());
@@ -150,7 +150,7 @@ namespace DeliverBox_BE.Controllers
                             count++;
                         }
                     }
-                    result.Add(new CharObject(i.ToString() , now.Day + "/" + now.Month, count));
+                    result.Add(new CharObject((-(i - 8)).ToString() , now.Day + "/" + now.Month, count));
                     count = 0;
                 }
 
