@@ -398,9 +398,13 @@ namespace DeliverBox_BE.Controllers
                 foreach (var item in response)
                 {
                     dynamic value = item.Object;
-                    list.Add(value.data);
+                    var messageData = value.message;
+                    foreach (var item2 in messageData) {
+                        var model = (messageData["messageTitle"], messageData["messageBody"], messageData["sendDate"]);
+                        list.Add(model);
+                    }
                 }
-
+                
                 Dictionary<string, dynamic> dict = new()
                 {
                     { "message", list }

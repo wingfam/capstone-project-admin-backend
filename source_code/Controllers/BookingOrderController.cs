@@ -145,27 +145,34 @@ namespace DeliverBox_BE.Controllers
                 var list = new List<BookingOrder>();
                 var temp = new BookingOrder();
 
-                if(data != null)
+                DateTime startTime = DateTime.Parse(createDateStart);
+                DateTime endTime = DateTime.Parse(createDateEnd);
+                endTime = endTime.AddHours(23);
+                endTime = endTime.AddMinutes(59);
+                endTime = endTime.AddSeconds(59);
+
+
+                if (data != null)
                 {
                     foreach (var item in data)
                     {
                         temp = JsonConvert.DeserializeObject<BookingOrder>(((JProperty)item).Value.ToString());
-                        if (boxId == null && businessId == null && temp.createDate >= DateTime.Parse(createDateStart) && temp.createDate <= DateTime.Parse(createDateEnd))
+                        if (boxId == null && businessId == null && temp.createDate >= startTime && temp.createDate <= endTime)
                         {
                            list.Add(temp);
-                        } else if (boxId == null && temp.createDate >= DateTime.Parse(createDateStart) && temp.createDate <= DateTime.Parse(createDateEnd))
+                        } else if (boxId == null && temp.createDate >= startTime && temp.createDate <= endTime)
                         {
                             if(temp.businessId == businessId)
                             {
                                 list.Add(temp);
                             }
-                        } else if (businessId == null && temp.createDate >= DateTime.Parse(createDateStart) && temp.createDate <= DateTime.Parse(createDateEnd))
+                        } else if (businessId == null && temp.createDate >= startTime && temp.createDate <= endTime)
                         {
                             if(temp.boxId == boxId)
                             {
                                 list.Add(temp);
                             }
-                        } else if (temp.createDate >= DateTime.Parse(createDateStart) && temp.createDate <= DateTime.Parse(createDateEnd))
+                        } else if (temp.createDate >= startTime && temp.createDate <= endTime)
                         {
                             if (temp.businessId == businessId && temp.boxId == boxId)
                             {

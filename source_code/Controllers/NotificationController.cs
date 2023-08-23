@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Authorization;
 using Newtonsoft.Json;
 using Microsoft.Data.Sql;
 using DeliverBox_BE.Models;
-using FireSharp;
 
 namespace DeliverBox_BE.Controllers
 {
@@ -17,7 +16,7 @@ namespace DeliverBox_BE.Controllers
         private static string AuthSecret = "QY1XtCBtW6LdNwMGx36VwjJKJqKYJmNOlP30jaxP";
         private static object BasePath = "https://slsd-capstone-project-default-rtdb.asia-southeast1.firebasedatabase.app/";
 
-        Firebase.Database.FirebaseClient firebaseClient = new Firebase.Database.FirebaseClient(
+        FirebaseClient firebaseClient = new FirebaseClient(
             baseUrl: BasePath.ToString(),
             new FirebaseOptions
             {
@@ -60,7 +59,7 @@ namespace DeliverBox_BE.Controllers
                     {
                         { "customerId", model.CustomerId },
                         { "token", model.Token },
-                        { "data", "" }
+                        { "message", "" }
                     };
                     await firebaseClient.Child("Notification").PostAsync(newToken);
                 }
