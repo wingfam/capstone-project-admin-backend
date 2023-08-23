@@ -141,7 +141,7 @@ namespace DeliverBox_BE.Controllers
                 for (int i = 7; i > 0; i--)
                 {
                     DateTime now = DateTime.Now;
-                    now = now.AddDays(-i);
+                    now = now.AddDays(-(i - 1));
                     foreach (var item in data)
                     {
                         temp = JsonConvert.DeserializeObject<BookingOrder>(((JProperty)item).Value.ToString());
