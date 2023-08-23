@@ -8,6 +8,7 @@ using DeliverBox_BE.Objects;
 using DeliverBox_BE.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.CodeAnalysis;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace DeliverBox_BE.Controllers
 {
@@ -397,12 +398,9 @@ namespace DeliverBox_BE.Controllers
 
                 foreach (var item in response)
                 {
-                    dynamic value = item.Object;
-                    var messageData = value.message;
-                    foreach (var item2 in messageData) {
-                        var model = (messageData["messageTitle"], messageData["messageBody"], messageData["sendDate"]);
-                        list.Add(model);
-                    }
+                    dynamic? data = item.Object;
+                    var model = (data.message);
+                    list.Add(model);
                 }
                 
                 Dictionary<string, dynamic> dict = new()
