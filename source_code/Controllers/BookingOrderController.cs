@@ -157,28 +157,31 @@ namespace DeliverBox_BE.Controllers
                     foreach (var item in data)
                     {
                         temp = JsonConvert.DeserializeObject<BookingOrder>(((JProperty)item).Value.ToString());
-                        if (boxId == null && businessId == null && temp.createDate >= startTime && temp.createDate <= endTime)
+                        if (boxId == null && businessId == null & temp.createDate >= startTime && temp.createDate <= endTime)
                         {
-                           list.Add(temp);
-                        } else if (boxId == null && temp.createDate >= startTime && temp.createDate <= endTime)
+                            list.Add(temp);
+                        } 
+                        else if (boxId == null && temp.createDate >= startTime && temp.createDate <= endTime)
                         {
-                            if(temp.businessId == businessId)
+                            if (temp.businessId == businessId)
                             {
                                 list.Add(temp);
                             }
-                        } else if (businessId == null && temp.createDate >= startTime && temp.createDate <= endTime)
+                        }
+                        else if (businessId == null && temp.createDate >= startTime && temp.createDate <= endTime)
                         {
-                            if(temp.boxId == boxId)
+                            if (temp.boxId == boxId)
                             {
                                 list.Add(temp);
                             }
-                        } else if (temp.createDate >= startTime && temp.createDate <= endTime)
+                        }
+                        else if (temp.createDate >= startTime && temp.createDate <= endTime)
                         {
                             if (temp.businessId == businessId && temp.boxId == boxId)
                             {
                                 list.Add(temp);
                             }
-                        }
+                        } 
                     }
 
                     //Include Resident data
