@@ -2,6 +2,15 @@
 {
     public class CabinetLog
     {
+        public CabinetLog(DateTime createDate, string? messageBody, int? messageStatus
+            , string? messageTitle, string cabinetId) {
+            this.createDate = createDate;
+            this.messageBody = messageBody;
+            this.messageStatus = messageStatus;
+            this.messageTitle = messageTitle;
+            this.cabinetId = cabinetId;
+        }
+
         public string? id {  get; set; }
         public DateTime createDate { get; set; }
         public string? messageBody { get; set; }
