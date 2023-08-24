@@ -67,7 +67,7 @@ namespace DeliverBox_BE.Controllers
             }
         }
 
-        [HttpGet(template: "get-order-by-resident-and-box")]
+        [HttpGet(template: "get-order-by-business-and-box")]
         public ActionResult GetOrderByResidentAndBox(string? busnessId, string? boxId)
         {
             try
