@@ -60,7 +60,7 @@ namespace DeliverBox_BE.Controllers
                 DateTime now = DateTime.Now;
                 client = new FireSharp.FirebaseClient(config);
 
-                var c = new CabinetLog(now, "Cabinet Id: " + cabinetId + "được update", 1, "Update Cabinet", cabinetId);
+                var c = new CabinetLog(now, "Cabinet được update", 1, "Update Cabinet", cabinetId);
                 PushResponse pushResponse = client.Push("CabinetLog/", c);
                 c.id = pushResponse.Result.name;
                 SetResponse setResponse = client.Set("CabinetLog/" + c.id, c);
@@ -109,7 +109,7 @@ namespace DeliverBox_BE.Controllers
                 DateTime now = DateTime.Now;
                 client = new FireSharp.FirebaseClient(config);
 
-                var c = new CabinetLog(now, "Cabinet Id: " + cabinetId + " đã bị vô hiệu hóa", 1, "Vô hiệu hóa Cabinet", cabinetId);
+                var c = new CabinetLog(now, "Cabinet đã bị vô hiệu hóa", 1, "Vô hiệu hóa Cabinet", cabinetId);
                 PushResponse pushResponse = client.Push("CabinetLog/", c);
                 c.id = pushResponse.Result.name;
                 SetResponse setResponse = client.Set("CabinetLog/" + c.id, c);
