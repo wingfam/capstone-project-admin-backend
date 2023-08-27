@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Authorization;
 using Newtonsoft.Json;
 using Microsoft.Data.Sql;
 using DeliverBox_BE.Models;
+using System.Diagnostics;
+using NuGet.Protocol;
 
 namespace DeliverBox_BE.Controllers
 {
@@ -32,36 +34,31 @@ namespace DeliverBox_BE.Controllers
         // Save fcm token of android device to firebase
         [Authorize]
         [HttpPost(template: "save-fcm-token")]
-        public async Task<ActionResult> SaveFcmToken([FromBody] NotificationRequest model)
+        public async Task<ActionResult> SaveFcmToken([FromBody] NotificationRequest requestModel)
         {
             try
             {
+                //Debug.WriteLine("Send token: " + requestModel.Token);
+
                 var response = await firebaseClient
                     .Child("Notification")
+                    .OrderBy("customerId")
+                    .EqualTo(requestModel.CustomerId)
                     .OnceAsync<Object>();
-
-                bool check = false;
 
                 foreach (var item in response)
                 {
                     dynamic value = item.Object;
+                    string codeId = item.Key;
                     string gotToken = value.token;
 
-                    if (gotToken == model.Token)
+                    //Debug.WriteLine("gotToken: " + gotToken);
+                    if (gotToken != requestModel.Token)
                     {
-                        check = true;
+                        Debug.WriteLine("FCM token updated with: " + requestModel.Token);
+                        var updateToken = new Dictionary<string, string> { { "token", requestModel.Token } };
+                        await firebaseClient.Child("Notification").Child(codeId).PatchAsync(updateToken);
                     }
-                }
-
-                if (!check)
-                {
-                    var newToken = new Dictionary<string, string>
-                    {
-                        { "customerId", model.CustomerId },
-                        { "token", model.Token },
-                        { "message", "" }
-                    };
-                    await firebaseClient.Child("Notification").PostAsync(newToken);
                 }
 
                 var result = new { errCode = 0, errMessage = "Success" };
@@ -70,6 +67,14 @@ namespace DeliverBox_BE.Controllers
             }
             catch (Exception ex)
             {
+                var newToken = new Dictionary<string, string>
+                    {
+                        { "customerId", requestModel.CustomerId },
+                        { "token", requestModel.Token },
+                        { "message", "" }
+                    };
+                await firebaseClient.Child("Notification").PostAsync(newToken);
+
                 var result = new { errCode = 1, errMessage = ex.Message };
                 var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
                 return Content(json, "application/json");

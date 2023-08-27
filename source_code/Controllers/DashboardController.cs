@@ -164,5 +164,52 @@ namespace DeliverBox_BE.Controllers
                 return Content(json, "application/json");
             }
         }
+
+        [HttpGet(template: "get-business-order")]
+        public ActionResult GetBusinessOrder ()
+        {
+            try
+            {
+                client = new FireSharp.FirebaseClient(config);
+
+                FirebaseResponse response = client.Get("BookingOrder");
+                dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+                int count_1 = 0;
+                int count_2 = 0;
+                BookingOrder temp = new BookingOrder();
+                var result = new List<BusniessChartObject>();
+                for (int i = 7; i > 0; i--)
+                {
+                    DateTime now = DateTime.Now;
+                    now = now.AddDays(-(i - 1));
+                    foreach (var item in data)
+                    {
+                        temp = JsonConvert.DeserializeObject<BookingOrder>(((JProperty)item).Value.ToString());
+                        if (temp.createDate.Date == now.Date)
+                        {
+                            if(temp.businessId == "-NZMjlIkwdasdM9WfQJx")
+                            {
+                                count_1 ++;
+                            } else if (temp.businessId == "-NbAX14dQHa8HIDjk-Km")
+                            {
+                                count_2 ++;
+                            }
+                        }
+                    }
+                    result.Add(new BusniessChartObject((-(i - 8)).ToString(), now.Day + "/" + now.Month
+                        , "Vinhomes", count_1, "The CBD", count_2));
+                    count_1 = 0;
+                    count_2 = 0;
+                }
+
+                var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                return Content(json, "application/json");
+            } catch (Exception ex)
+            {
+                var result = new { errCode = 1, errMessage = ex.Message };
+                var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                return Content(json, "application/json");
+            }
+        }
     }
 }
