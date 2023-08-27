@@ -76,11 +76,8 @@ namespace DeliverBox_BE.Controllers
 
                 List<Cabinet> cabinetList = await GetCabinetByLocationId(locationId);
 
-                Debug.WriteLine($"Cabinet list: {cabinetList.Count}");
-
                 if (cabinetList.Count == 0)
                 {
-                    Debug.WriteLine("Không có cabinet ở địa điểm này");
                     result = new { errCode = 1, errMessage = "Không có cabinet ở địa điểm này" };
                 }
                 else
@@ -89,24 +86,25 @@ namespace DeliverBox_BE.Controllers
                     {
                         string? cabinetId = cabinet.id;
                         availableBox = await GetAvailableBoxByCabinetId(cabinetId);
+                        if (availableBox.nameBox != null)
+                        {
+                            var dict = new Dictionary<string, dynamic>
+                            {
+                                { "id", availableBox.id! },
+                                { "nameBox", availableBox.nameBox! },
+                                { "status", availableBox.status! },
+                                { "errCode", 0 },
+                                { "errMessage", "Success" },
+                            };
+
+                            result = dict;
+                            break;
+                        }
                     }
 
                     if (availableBox.nameBox == null)
                     {
                         result = new { errCode = 2, errMessage = "Không có tủ trống" };
-                    }
-                    else
-                    {
-                        var dict = new Dictionary<string, dynamic>
-                    {
-                        { "id", availableBox.id },
-                        { "nameBox", availableBox.nameBox },
-                        { "status", availableBox.status },
-                        { "errCode", 0 },
-                        { "errMessage", "Success" },
-                    };
-
-                        result = dict;
                     }
                 }
 
@@ -308,21 +306,21 @@ namespace DeliverBox_BE.Controllers
         }
 
         [HttpPost(template: "create-new-booking-code")]
-        public async Task<ActionResult> NewBookingCode(string bookingId)
+        public async Task<ActionResult> AddNewBookingCode([FromBody] NewBookingCodeRequest request)
         {
             try
             {
-                var bookingCode = await CreateNewBookingCode(bookingId);
+                var newBookingCode = await CreateNewBookingCode(request.BookingId!);
                 string logTitle = "Tạo mã booking";
-                string logBody = $"Mã booking {bookingCode} được tạo thành công";
+                string logBody = $"Mã booking {newBookingCode} được tạo thành công";
 
-                await CreateNewBookingLog(bookingId, logTitle, logBody);
+                await CreateNewBookingLog(request.BookingId!, logTitle, logBody);
 
                 Dictionary<string, dynamic> result = new()
                 {
-                    { "bookingCode", bookingCode },
+                    { "bookingCode", newBookingCode },
                     { "errCode", 0 },
-                    { "errMessage", $"Mã booking mới {bookingCode} được tạo thành công" }
+                    { "errMessage", $"Mã booking mới {newBookingCode} được tạo thành công" }
                 };
 
                 var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
@@ -447,7 +445,7 @@ namespace DeliverBox_BE.Controllers
                 Debug.WriteLine(ex);
             }
 
-            Debug.WriteLine($"Cabinet list: {list.Count()}");
+            //Debug.WriteLine($"Cabinet list: {list.Count()}");
             return list;
         }
 
@@ -471,7 +469,6 @@ namespace DeliverBox_BE.Controllers
                         box.id = value.id;
                         box.nameBox = value.nameBox;
                         box.status = value.status;
-                        break;
                     }
                 }
             }
@@ -480,7 +477,6 @@ namespace DeliverBox_BE.Controllers
                 Debug.WriteLine(ex);
             }
 
-            Debug.WriteLine($"Box: {box.nameBox}, status: {box.status}");
             return box;
         }
 
@@ -517,13 +513,12 @@ namespace DeliverBox_BE.Controllers
                 var response = await firebaseClient
                     .Child("BookingCode")
                     .OrderBy("validDate")
-                    .LimitToLast(1)
                     .OnceAsync<Object>();
 
                 foreach (var item in response)
                 {
                     dynamic value = item.Object;
-                    string bookingId = value.bookingId;
+                    string bookingId = (string)value.bookingId;
                     if (bookingId == inputbookingId)
                     {
                         bookingCode = (string)value.bcode;
@@ -532,6 +527,7 @@ namespace DeliverBox_BE.Controllers
             }
             catch (Exception ex)
             {
+                Debug.WriteLine("Exception here");
                 Debug.WriteLine(ex);
             }
 
@@ -572,6 +568,48 @@ namespace DeliverBox_BE.Controllers
             }
             
             return bookingId;
+        }
+
+        private async Task<bool> DeactivateBookingCode(string oldBookingCode)
+        {
+            bool isDeactivate = false;
+            try
+            {
+                string id = "";
+
+                var response = await firebaseClient
+                    .Child("BookingCode")
+                    .OrderBy("bcode")
+                    .EqualTo(oldBookingCode)
+                    .OnceAsync<Object>();
+                
+                foreach (var item in response) {
+                    dynamic value = item.Object;
+                    id = (string)value.id;
+                    break;
+                }
+
+                if (id != null)
+                {
+                    var data = new Dictionary<string, dynamic>
+                    {
+                        { "status", 0 },
+                    };
+
+                    await firebaseClient
+                        .Child("BookingCode")
+                        .Child(id)
+                        .PatchAsync(data);
+
+                    isDeactivate = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex);
+            }
+
+            return isDeactivate;
         }
 
         private async Task<string> CreateNewBookingCode(string bookingId)
