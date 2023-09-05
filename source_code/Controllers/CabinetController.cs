@@ -188,7 +188,7 @@ namespace DeliverCabinet_BE.Controllers
             {
                 client = new FireSharp.FirebaseClient(config);
 
-                var c = new Cabinet(model.nameCabinet, createDate, 0, model.locationId, model.businessId, 0, null, null);
+                var c = new Cabinet(model.nameCabinet, createDate, 0, model.locationId, model.businessId, 0, "123456", 1);
 
                 PushResponse pushResponse = client.Push("Cabinet/", c);
                 c.id = pushResponse.Result.name;
