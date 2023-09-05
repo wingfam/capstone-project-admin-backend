@@ -17,7 +17,7 @@ namespace DeliverBox_BE.Objects
             this.businessId = businessId;
             this.status = status;
             this.masterCode = mastercode;
-            this.masterCodeStatus = masterCodeStatus;
+            this.masterCodeStatus = mastercodeStatus;
         }
 
         public string? id { get; set; } = null;
