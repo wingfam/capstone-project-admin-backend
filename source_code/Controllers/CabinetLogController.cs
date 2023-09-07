@@ -76,31 +76,6 @@ namespace DeliverBox_BE.Controllers
             }
         }
 
-        [HttpPost(template: "add-create-log")]
-        public ActionResult AddCreateLog(string cabinetId)
-        {
-            try
-            {
-                DateTime now = DateTime.Now;
-                client = new FireSharp.FirebaseClient(config);
-
-                var c = new CabinetLog(now, "Cabinet mới được tạo", 1, "Tạo Cabinet", cabinetId);
-                PushResponse pushResponse = client.Push("CabinetLog/", c);
-                c.id = pushResponse.Result.name;
-                SetResponse setResponse = client.Set("CabinetLog/" + c.id, c);
-
-                var result = new { errCode = 0, errMessage = "Success" };
-                var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
-                return Content(json, "application/json");
-            }
-            catch (Exception ex)
-            {
-                var result = new { errCode = 1, errMessage = ex.Message };
-                var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
-                return Content(json, "application/json");
-            }
-        }
-
         [HttpPost(template: "add-disable-log")]
         public ActionResult AddDisableLog(string cabinetId)
         {

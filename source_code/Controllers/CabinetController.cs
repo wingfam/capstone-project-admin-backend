@@ -194,6 +194,11 @@ namespace DeliverCabinet_BE.Controllers
                 c.id = pushResponse.Result.name;
                 SetResponse setResponse = client.Set("Cabinet/" + c.id, c);
 
+                var cabinetLog = new CabinetLog(createDate, "Cabinet mới được tạo", 1, "Tạo Cabinet", c.id);
+                pushResponse = client.Push("CabinetLog/", cabinetLog);
+                cabinetLog.id = pushResponse.Result.name;
+                setResponse = client.Set("CabinetLog/" + cabinetLog.id, cabinetLog);
+
                 var result = new { errCode = 0, errMessage = "Success" };
                 var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
                 return Content(json, "application/json");
