@@ -187,6 +187,20 @@ namespace DeliverCabinet_BE.Controllers
             try
             {
                 client = new FireSharp.FirebaseClient(config);
+                FirebaseResponse response = client.Get("Cabinet");
+                dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+
+                if(data != null)
+                {
+                    foreach (var item in data)
+                    {
+                        var cabinet = JsonConvert.DeserializeObject<Cabinet>(((JProperty)item).Value.ToJson());
+                        if(cabinet.nameCabinet.ToLower() == model.nameCabinet.ToLower())
+                        {
+                            return Content(JsonConvert.SerializeObject(new { errCode = 1, errMessage = "Invalid Cabinet Name" }, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None }), "application/json");
+                        }
+                    }
+                }
 
                 var c = new Cabinet(model.nameCabinet, createDate, 0, model.locationId, model.businessId, 0, "123456", 1);
 
