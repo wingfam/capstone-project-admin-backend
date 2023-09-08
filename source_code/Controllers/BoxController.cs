@@ -142,9 +142,7 @@ namespace DeliverBox_BE.Controllers
                 {
                     foreach (var item in data)
                     {
-                        var value = JsonConvert.DeserializeObject<Box>(((JProperty)item).Value.ToJson());
-                        var jvalue = JsonConvert.SerializeObject(value, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
-                        var box = JsonConvert.DeserializeObject<Box>(jvalue);
+                        var box = JsonConvert.DeserializeObject<Box>(((JProperty)item).Value.ToJson());
                         if (box.nameBox.ToLower() == model.nameBox.ToLower())
                         {
                             var errResult = new { errCode = 1, errMessage = "Invalid Box Name" };
