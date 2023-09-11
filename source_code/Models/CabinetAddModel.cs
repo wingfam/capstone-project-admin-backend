@@ -3,6 +3,7 @@
     public class CabinetAddModel
     {
         public string nameCabinet { get; set; }
+        public int totalBox { get; set; }
         public string locationId { get; set; }
         public string businessId { get; set; }
     }

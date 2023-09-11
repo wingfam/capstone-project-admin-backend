@@ -202,7 +202,7 @@ namespace DeliverCabinet_BE.Controllers
                     }
                 }
 
-                var c = new Cabinet(model.nameCabinet, createDate, 0, model.locationId, model.businessId, 0, "123456", 1);
+                var c = new Cabinet(model.nameCabinet, createDate, model.totalBox, model.locationId, model.businessId, 0, "123456", 1);
 
                 PushResponse pushResponse = client.Push("Cabinet/", c);
                 c.id = pushResponse.Result.name;
