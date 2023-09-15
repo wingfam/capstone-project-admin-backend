@@ -7,6 +7,8 @@ using Microsoft.Data.Sql;
 using DeliverBox_BE.Models;
 using System.Diagnostics;
 using NuGet.Protocol;
+using System.Diagnostics.Tracing;
+using Microsoft.IdentityModel.Tokens;
 
 namespace DeliverBox_BE.Controllers
 {
@@ -15,10 +17,10 @@ namespace DeliverBox_BE.Controllers
     
     public class NotificationController : Controller
     {
-        private static string AuthSecret = "QY1XtCBtW6LdNwMGx36VwjJKJqKYJmNOlP30jaxP";
-        private static object BasePath = "https://slsd-capstone-project-default-rtdb.asia-southeast1.firebasedatabase.app/";
+        private static readonly string AuthSecret = "QY1XtCBtW6LdNwMGx36VwjJKJqKYJmNOlP30jaxP";
+        private static readonly object BasePath = "https://slsd-capstone-project-default-rtdb.asia-southeast1.firebasedatabase.app/";
 
-        FirebaseClient firebaseClient = new FirebaseClient(
+        readonly FirebaseClient firebaseClient = new(
             baseUrl: BasePath.ToString(),
             new FirebaseOptions
             {
@@ -32,49 +34,69 @@ namespace DeliverBox_BE.Controllers
         }
 
         // Save fcm token of android device to firebase
-        [Authorize]
         [HttpPost(template: "save-fcm-token")]
+        //[Authorize]
         public async Task<ActionResult> SaveFcmToken([FromBody] NotificationRequest requestModel)
         {
             try
             {
-                //Debug.WriteLine("Send token: " + requestModel.Token);
+                var result = new Dictionary<string, dynamic> ();
 
                 var response = await firebaseClient
                     .Child("Notification")
-                    .OrderBy("customerId")
-                    .EqualTo(requestModel.CustomerId)
+                    .OrderBy("deviceId")
+                    .EqualTo(requestModel.DeviceId)
                     .OnceAsync<Object>();
 
-                foreach (var item in response)
-                {
-                    dynamic value = item.Object;
-                    string codeId = item.Key;
-                    string gotToken = value.token;
+                //Debug.WriteLine("Result: " + response.FirstOrDefault());
 
-                    //Debug.WriteLine("gotToken: " + gotToken);
-                    if (gotToken != requestModel.Token)
+                if (response.FirstOrDefault() == null)
+                {
+                    var newToken = new Dictionary<string, string>
                     {
-                        Debug.WriteLine("FCM token updated with: " + requestModel.Token);
-                        var updateToken = new Dictionary<string, string> { { "token", requestModel.Token } };
-                        await firebaseClient.Child("Notification").Child(codeId).PatchAsync(updateToken);
+                        { "deviceId", requestModel.DeviceId },
+                        { "token", requestModel.Token },
+                        { "message", "" }
+                    };
+
+                    await firebaseClient.Child("Notification").PostAsync(newToken);
+
+                    result = new()
+                    {
+                        { "errCode", 0 },
+                        { "errMessage",  "New FCM token has been created" },
+                    };
+                }
+                else
+                {
+                    foreach (var item in response)
+                    {
+                        dynamic value = item.Object;
+                        string codeId = item.Key;
+                        string gotToken = value.token;
+
+                        if (gotToken != requestModel.Token)
+                        {
+                            Debug.WriteLine("FCM token updated with: " + requestModel.Token);
+                            var updateToken = new Dictionary<string, string> { { "token", requestModel.Token } };
+                            await firebaseClient.Child("Notification").Child(codeId).PatchAsync(updateToken);
+
+                            result = new()
+                            {
+                                { "errCode", 0 },
+                                { "errMessage",  "FCM token has been updated" },
+                            };
+
+                            break;
+                        }
                     }
                 }
 
-                var result = new { errCode = 0, errMessage = "Success" };
                 var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
                 return Content(json, "application/json");
             }
             catch (Exception ex)
             {
-                var newToken = new Dictionary<string, string>
-                    {
-                        { "customerId", requestModel.CustomerId },
-                        { "token", requestModel.Token },
-                        { "message", "" }
-                    };
-                await firebaseClient.Child("Notification").PostAsync(newToken);
-
                 var result = new { errCode = 1, errMessage = ex.Message };
                 var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
                 return Content(json, "application/json");

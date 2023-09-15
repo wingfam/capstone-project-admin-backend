@@ -14,14 +14,13 @@ namespace DeliverBox_BE.Controllers
 {
     [Route("api/v1/customer")]
     [ApiController]
-    [Authorize]
 
     public class CustomerController : Controller
     {
-        private static string secret = "QY1XtCBtW6LdNwMGx36VwjJKJqKYJmNOlP30jaxP";
-        private static object path = "https://slsd-capstone-project-default-rtdb.asia-southeast1.firebasedatabase.app/";
+        private static readonly string secret = "QY1XtCBtW6LdNwMGx36VwjJKJqKYJmNOlP30jaxP";
+        private static readonly object path = "https://slsd-capstone-project-default-rtdb.asia-southeast1.firebasedatabase.app/";
 
-        FirebaseClient firebaseClient = new FirebaseClient(
+        readonly FirebaseClient firebaseClient = new(
             baseUrl: path.ToString(),
             new FirebaseOptions
             {
@@ -29,6 +28,7 @@ namespace DeliverBox_BE.Controllers
             });
 
         [HttpGet(template: "search-location-by-businessId")]
+        [Authorize]
         public async Task<ActionResult> SearchLocationByBusinessId(string businessId)
         {
             try
@@ -50,7 +50,7 @@ namespace DeliverBox_BE.Controllers
                     list.Add(model);
                 }
 
-                Dictionary<string, dynamic> dict = new Dictionary<string, dynamic>
+                Dictionary<string, dynamic> dict = new()
                 {
                     { "data", list }
                 };
@@ -67,6 +67,7 @@ namespace DeliverBox_BE.Controllers
         }
 
         [HttpGet(template: "get-available-box")]
+        [Authorize]
         public async Task<ActionResult> FetchAvailableBox(string locationId)
         {
             try
@@ -122,6 +123,7 @@ namespace DeliverBox_BE.Controllers
         }
 
         [HttpPost(template: "add-new-booking")]
+        [Authorize]
         public async Task<ActionResult> AddNewBooking([FromBody] NewBookingModel model)
         {
             try
@@ -174,14 +176,15 @@ namespace DeliverBox_BE.Controllers
         }
 
         [HttpGet(template: "get-active-booking")]
-        public async Task<ActionResult> FetchActiveBooking(string customerId)
+        [Authorize]
+        public async Task<ActionResult> FetchActiveBooking(string deviceId)
         {
             try
             {
                 var response = await firebaseClient
                 .Child("BookingOrder")
-                .OrderBy("customerId")
-                .EqualTo(customerId)
+                .OrderBy("deviceId")
+                .EqualTo(deviceId)
                 .OnceAsync<Object>();
 
                 List<Object> list = new();
@@ -191,14 +194,17 @@ namespace DeliverBox_BE.Controllers
                     dynamic value = item.Object;
                     if (value.status == 2 || value.status == 3)
                     {
-                        ActiveBookingResponseModel model = new();
-                        model.BookingId = value.id;
-                        model.BoxId = value.boxId;
-                        model.ValidDate = value.validDate;
-                        model.Status = value.status;
-                        model.UnlockCode = value.unlockCode;
-                        model.BoxName = await GetBoxNameById((string)value.boxId);
-                        model.BookingCode = await GetLastBookingCodeByBookingId((string)value.id);
+                        ActiveBookingResponseModel model = new()
+                        {
+                            BookingId = value.id,
+                            BoxId = value.boxId,
+                            ValidDate = value.validDate,
+                            Status = value.status,
+                            UnlockCode = value.unlockCode,
+                            BoxName = await GetBoxNameById((string)value.boxId),
+                            BookingCode = await GetLastBookingCodeByBookingId((string)value.id)
+                        };
+
                         list.Add(model);
                     }
                 }
@@ -222,6 +228,7 @@ namespace DeliverBox_BE.Controllers
         }
 
         [HttpPost(template: "cancel-processing-booking")]
+        [Authorize]
         public async Task<ActionResult> CancelProcessingBooking([FromBody] CancelProcessingBookingModel model)
         {
             try
@@ -267,11 +274,12 @@ namespace DeliverBox_BE.Controllers
         }
 
         [HttpPost(template: "update-unlock-code")]
+        [Authorize]
         public async Task<ActionResult> UpdateUnlockCode(string bookingId)
         {
             try
             {
-                RandomDigits randomDigits = new RandomDigits();
+                RandomDigits randomDigits = new();
                 string newUnlockCode = randomDigits.GenerateRandomCode();
                 string logTitle = "Cập nhật mã unlock";
                 string logBody = $"Mã unlock {newUnlockCode} được cập nhật thành công";
@@ -306,6 +314,7 @@ namespace DeliverBox_BE.Controllers
         }
 
         [HttpPost(template: "create-new-booking-code")]
+        [Authorize]
         public async Task<ActionResult> AddNewBookingCode([FromBody] NewBookingCodeRequest request)
         {
             try
@@ -337,14 +346,15 @@ namespace DeliverBox_BE.Controllers
         }
 
         [HttpGet(template: "get-booking-history")]
-        public async Task<ActionResult> FetchBookingHistory(string customerId)
+        [Authorize]
+        public async Task<ActionResult> FetchBookingHistory(string deviceId)
         {
             try
             {
                 var response = await firebaseClient
                 .Child("BookingOrder")
-                .OrderBy("customerId")
-                .EqualTo(customerId)
+                .OrderBy("deviceId")
+                .EqualTo(deviceId)
                 .OnceAsync<Object>();
 
                 List<Object> list = new();
@@ -354,11 +364,13 @@ namespace DeliverBox_BE.Controllers
                     dynamic value = item.Object;
                     if (value.status == 4 || value.status == 5)
                     {
-                        BookingHistoryResponseModel model = new();
-                        model.ValidDate = value.validDate;
-                        model.CreateDate = value.createDate;
-                        model.Status = value.status;
-                        model.BoxName = await GetBoxNameById((string)value.boxId);
+                        BookingHistoryResponseModel model = new()
+                        {
+                            ValidDate = value.validDate,
+                            CreateDate = value.createDate,
+                            Status = value.status,
+                            BoxName = await GetBoxNameById((string)value.boxId)
+                        };
                         list.Add(model);
                     }
                 }
@@ -382,14 +394,15 @@ namespace DeliverBox_BE.Controllers
         }
 
         [HttpGet(template: "get-notification")]
-        public async Task<ActionResult> FetchNotification(string customerId)
+        [Authorize]
+        public async Task<ActionResult> FetchNotification(string deviceId)
         {
             try
             {
                 var response = await firebaseClient
                 .Child("Notification")
-                .OrderBy("customerId")
-                .EqualTo(customerId)
+                .OrderBy("deviceId")
+                .EqualTo(deviceId)
                 .OnceAsync<Object>();
 
                 List<Object> list = new();
@@ -433,7 +446,7 @@ namespace DeliverBox_BE.Controllers
                 foreach (var item in response)
                 {
                     dynamic value = item.Object;
-                    Cabinet cabinet = new Cabinet
+                    Cabinet cabinet = new()
                     {
                         id = value.id
                     };
@@ -545,7 +558,7 @@ namespace DeliverBox_BE.Controllers
                     { "id", "" },
                     { "businessId", model.BusinessId },
                     { "boxId", model.BoxId },
-                    { "customerId", model.CustomerId },
+                    { "deviceId", model.DeviceId },
                     { "status", 2 },
                     { "createDate", currentTime },
                     { "validDate", model.ValidDate },
@@ -618,7 +631,7 @@ namespace DeliverBox_BE.Controllers
             try
             {
                 DateTime currentTime = DateTime.Now.AddMinutes(10.0);
-                RandomDigits randomDigits = new RandomDigits();
+                RandomDigits randomDigits = new();
                 newBookingCode = randomDigits.GenerateRandomCode();
                 string validDate = currentTime.ToString("yyyy-MM-dd HH:mm");
                 var data = new Dictionary<string, dynamic>
