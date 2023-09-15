@@ -632,8 +632,8 @@ namespace DeliverBox_BE.Controllers
             string newBookingCode = "";
             try
             {
-                DateTime currentTime = TimeZoneInfo.ConvertTime(DateTime.Now, TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"));
-                string validDate = currentTime.AddMinutes(10.0).ToString("yyyy-MM-dd HH:mm");
+                DateTime currentTime = TimeZoneInfo.ConvertTime(DateTime.Now.AddMinutes(10.0), TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"));
+                string validDate = currentTime.ToString("yyyy-MM-dd HH:mm");
 
                 RandomDigits randomDigits = new();
                 newBookingCode = randomDigits.GenerateRandomCode();
