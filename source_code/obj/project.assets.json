@@ -12616,19 +12616,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\ASUS\\.nuget\\packages\\": {}
+    "C:\\Users\\Sworcerer.SWORCERER\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\ASUS\\Desktop\\Admin_BE\\capstone-project-admin-backend\\source_code\\DeliverBox_BE.csproj",
+      "projectUniqueName": "M:\\GitHub\\capstone-project-admin-backend\\source_code\\DeliverBox_BE.csproj",
       "projectName": "DeliverBox_BE",
-      "projectPath": "C:\\Users\\ASUS\\Desktop\\Admin_BE\\capstone-project-admin-backend\\source_code\\DeliverBox_BE.csproj",
-      "packagesPath": "C:\\Users\\ASUS\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\ASUS\\Desktop\\Admin_BE\\capstone-project-admin-backend\\source_code\\obj\\",
+      "projectPath": "M:\\GitHub\\capstone-project-admin-backend\\source_code\\DeliverBox_BE.csproj",
+      "packagesPath": "C:\\Users\\Sworcerer.SWORCERER\\.nuget\\packages\\",
+      "outputPath": "M:\\GitHub\\capstone-project-admin-backend\\source_code\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\ASUS\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\Sworcerer.SWORCERER\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
