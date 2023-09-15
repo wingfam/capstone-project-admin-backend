@@ -233,7 +233,7 @@ namespace DeliverBox_BE.Controllers
         {
             try
             {
-                DateTime currentTime = DateTime.Now;
+                DateTime currentTime = TimeZoneInfo.ConvertTime(DateTime.Now, TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"));
                 string cancelDate = currentTime.ToString("yyyy-MM-dd HH:mm");
                 string logTitle = "Hủy booking";
                 string logBody = $"Booking được hủy vào ngày: {cancelDate}";
@@ -552,7 +552,9 @@ namespace DeliverBox_BE.Controllers
             string bookingId = "";
             try
             {
-                string currentTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm");
+                DateTime currentTime = TimeZoneInfo.ConvertTime(DateTime.Now, TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"));
+                string createDate = currentTime.ToString("yyyy-MM-dd HH:mm");
+
                 var data = new Dictionary<string, dynamic>
                 {
                     { "id", "" },
@@ -560,7 +562,7 @@ namespace DeliverBox_BE.Controllers
                     { "boxId", model.BoxId },
                     { "deviceId", model.DeviceId },
                     { "status", 2 },
-                    { "createDate", currentTime },
+                    { "createDate", createDate },
                     { "validDate", model.ValidDate },
                     { "unlockCode", newUnlockCode }
                 };
@@ -630,10 +632,12 @@ namespace DeliverBox_BE.Controllers
             string newBookingCode = "";
             try
             {
-                DateTime currentTime = DateTime.Now.AddMinutes(10.0);
+                DateTime currentTime = TimeZoneInfo.ConvertTime(DateTime.Now, TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"));
+                string validDate = currentTime.AddMinutes(10.0).ToString("yyyy-MM-dd HH:mm");
+
                 RandomDigits randomDigits = new();
                 newBookingCode = randomDigits.GenerateRandomCode();
-                string validDate = currentTime.ToString("yyyy-MM-dd HH:mm");
+
                 var data = new Dictionary<string, dynamic>
                 {
                     { "bookingId", bookingId },
@@ -666,8 +670,9 @@ namespace DeliverBox_BE.Controllers
             string logId = "";
             try
             {
-                DateTime currentTime = DateTime.Now;
+                DateTime currentTime = TimeZoneInfo.ConvertTime(DateTime.Now, TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"));
                 string createDate = currentTime.ToString("yyyy-MM-dd HH:mm");
+
                 var data = new Dictionary<string, dynamic>
                 {
                     { "id", "" },
