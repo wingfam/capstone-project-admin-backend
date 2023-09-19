@@ -136,7 +136,7 @@ namespace DeliverBox_BE.Controllers
                 string bookingId = await CreateNewBooking(model, newUnlockCode);
                 string bookingCode = await CreateNewBookingCode(bookingId);
                 string logId = await CreateNewBookingLog(bookingId, logTitle, logBody);
-                //bool updateBoxStatus = await UpdateBoxStatus(model.BoxId, 2);
+                bool updateBoxStatus = await UpdateBoxProcess(model.BoxId, 2);
 
                 if (bookingId != null && bookingCode != null && logId != null)
                 {
@@ -241,17 +241,17 @@ namespace DeliverBox_BE.Controllers
 
                 var newBookingStatus = new Dictionary<string, dynamic> { { "status", 5 }, };
 
-                //var newBoxStatus = new Dictionary<string, dynamic> { { "status", 1 }, };
+                var newBoxProcess = new Dictionary<string, dynamic> { { "process", 0 }, };
 
                 await firebaseClient
                   .Child("BookingOrder")
                   .Child(model.BookingId)
                   .PatchAsync(newBookingStatus);
 
-                //await firebaseClient
-                //  .Child("Box")
-                //  .Child(model.BoxId)
-                //  .PatchAsync(newBoxStatus);
+                await firebaseClient
+                  .Child("Box")
+                  .Child(model.BoxId)
+                  .PatchAsync(newBoxProcess);
 
                 Dictionary<string, dynamic> result = new()
                 {
@@ -533,15 +533,14 @@ namespace DeliverBox_BE.Controllers
                     .Child("Box")
                     .OrderBy("cabinetId")
                     .EqualTo(cabinetId)
-                    .OnceAsync<Box>();
+                    .OnceAsync<Object>();
 
                 foreach (var item in response)
                 {
                     dynamic value = item.Object;
                     int status = (int)(long)value.status;
-                    int bookingStatus = await GetBookingStatusByBoxId((string)value.id);
-
-                    if (bookingStatus == 1)
+                    int process = (int)(long)value.process;
+                    if (status == 1 && process == 0)
                     {
                         box.id = value.id;
                         box.nameBox = value.nameBox;
@@ -555,38 +554,6 @@ namespace DeliverBox_BE.Controllers
             }
 
             return box;
-        }
-
-        private async Task<int> GetBookingStatusByBoxId(string? boxId)
-        {
-            int bookingStatus = 0;
-
-            try
-            {
-                var response = await firebaseClient
-                    .Child("BookingOrder")
-                    .OrderBy("boxId")
-                    .EqualTo(boxId)
-                    .OnceAsync<Object>();
-
-                List<int> statusList = new();
-
-                foreach (var item in response)
-                {
-                    dynamic value = item.Object;
-                    int status = (int)(long)value.status;
-                    statusList.Add(status);
-                }
-
-                int lastStatus = statusList.Last();
-                Debug.WriteLine(lastStatus);
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(ex);
-            }
-
-            return bookingStatus;
         }
 
         private async Task<string> GetBoxNameById(string? boxId)
@@ -798,12 +765,13 @@ namespace DeliverBox_BE.Controllers
             return logId;
         }
 
-        private async Task<bool> UpdateBoxStatus(string boxId, int inputStatus)
+        private async Task<bool> UpdateBoxProcess(string boxId, int inputProcess)
         {
             bool isUpdate = false;
+
             try
             {
-                var newStatus = new Dictionary<string, dynamic>{ { "status", inputStatus }, };
+                var newStatus = new Dictionary<string, dynamic>{ { "process", inputProcess }, };
 
                 await firebaseClient
                     .Child("Box")
