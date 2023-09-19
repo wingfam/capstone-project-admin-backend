@@ -1,11 +1,14 @@
-﻿using DeliverBox_BE.Objects;
+﻿using DeliverBox_BE.Models;
+using DeliverBox_BE.Objects;
 using FireSharp.Config;
 using FireSharp.Interfaces;
 using FireSharp.Response;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.VisualBasic.Syntax;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace DeliverBox_BE.Controllers
 {
@@ -171,35 +174,65 @@ namespace DeliverBox_BE.Controllers
             try
             {
                 client = new FireSharp.FirebaseClient(config);
-
-                FirebaseResponse response = client.Get("BookingOrder");
+                FirebaseResponse response = client.Get("Business");
                 dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
-                int count_1 = 0;
-                int count_2 = 0;
+
+                var businesses = new List<Business>();
+                if (data != null)
+                {
+                    foreach (var item in data)
+                    {
+                        businesses.Add(JsonConvert.DeserializeObject<Business>(((JProperty)item).Value.ToString()));
+                    }
+                } else
+                {
+                    return Content(JsonConvert.SerializeObject(new { errCode = 1, errMessage = "Can't fetch business data" }, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None }), "application/json");
+                }
+
+                response = client.Get("BookingOrder");
+                data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+
                 BookingOrder temp = new BookingOrder();
-                var result = new List<BusniessChartObject>();
+                var listCharObj = new List<BusinessChartObject>();
+
                 for (int i = 7; i > 0; i--)
                 {
                     DateTime now = DateTime.Now;
                     now = now.AddDays(-(i - 1));
-                    foreach (var item in data)
+                    int count = 0;
+
+                    foreach(var business in businesses)
                     {
-                        temp = JsonConvert.DeserializeObject<BookingOrder>(((JProperty)item).Value.ToString());
-                        if (temp.createDate.Date == now.Date)
+                        foreach (var bookingOrder in data)
                         {
-                            if(temp.businessId == "-NZMjlIkwdasdM9WfQJx")
+                            temp = JsonConvert.DeserializeObject<BookingOrder>(((JProperty)bookingOrder).Value.ToString());
+                            if (temp.createDate.Date == now.Date)
                             {
-                                count_1 ++;
-                            } else if (temp.businessId == "-NbAX14dQHa8HIDjk-Km")
-                            {
-                                count_2 ++;
+                                if(temp.businessId == business.id)
+                                {
+                                    count++;
+                                }
                             }
                         }
+                        listCharObj.Add(new BusinessChartObject(now.Day + "/" + now.Month, business.businessName, count));
+                        count = 0;
                     }
-                    result.Add(new BusniessChartObject((-(i - 8)).ToString(), now.Day + "/" + now.Month
-                        , "Vinhomes", count_1, "The CBD", count_2));
-                    count_1 = 0;
-                    count_2 = 0;
+                }
+
+                var result = new List<BusinessChart>();
+                var orderPerDay = new Collection<BusinessChartObject>();
+                int y = 1;
+                for (int i = 7; i > 0; i--) {
+                    DateTime now = DateTime.Now;
+                    now = now.AddDays(-(i - 1));
+                    
+                    for (y = 1; y <= businesses.Count(); y++)
+                    {
+                        orderPerDay.Add(listCharObj[y-1]);
+                    }
+
+                    result.Add(new BusinessChart(now.Day + "/" + now.Month, orderPerDay));
+                    orderPerDay = new Collection<BusinessChartObject>();
                 }
 
                 var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
