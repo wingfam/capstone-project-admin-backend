@@ -569,15 +569,17 @@ namespace DeliverBox_BE.Controllers
                     .EqualTo(boxId)
                     .OnceAsync<Object>();
 
+                List<int> statusList = new();
+
                 foreach (var item in response)
                 {
                     dynamic value = item.Object;
                     int status = (int)(long)value.status;
-                    if (status == 1 || status == 4 || status == 5)
-                    {
-                        bookingStatus = 1;
-                    }
+                    statusList.Add(status);
                 }
+
+                int lastStatus = statusList.Last();
+                Debug.WriteLine(lastStatus);
             }
             catch (Exception ex)
             {
