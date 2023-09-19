@@ -7,8 +7,6 @@ using System.Diagnostics;
 using DeliverBox_BE.Objects;
 using DeliverBox_BE.Utils;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.CodeAnalysis;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace DeliverBox_BE.Controllers
 {
@@ -194,11 +192,14 @@ namespace DeliverBox_BE.Controllers
                     dynamic value = item.Object;
                     if (value.status == 2 || value.status == 3)
                     {
+                        string locationName = await GetLocationByBoxId((string)value.boxId);
+
                         ActiveBookingResponseModel model = new()
                         {
                             BookingId = value.id,
                             BoxId = value.boxId,
                             ValidDate = value.validDate,
+                            Location = locationName,
                             Status = value.status,
                             UnlockCode = value.unlockCode,
                             BoxName = await GetBoxNameById((string)value.boxId),
@@ -364,11 +365,14 @@ namespace DeliverBox_BE.Controllers
                     dynamic value = item.Object;
                     if (value.status == 4 || value.status == 5)
                     {
+                        string locationName = await GetLocationByBoxId((string)value.boxId);
+
                         BookingHistoryResponseModel model = new()
                         {
                             ValidDate = value.validDate,
                             CreateDate = value.createDate,
                             Status = value.status,
+                            Location = locationName,
                             BoxName = await GetBoxNameById((string)value.boxId)
                         };
                         list.Add(model);
@@ -462,9 +466,67 @@ namespace DeliverBox_BE.Controllers
             return list;
         }
 
+        private async Task<string> GetLocationByBoxId(string boxId)
+        {
+            string locationName = "";
+
+            try
+            {
+                string cabinetId = "";
+                string locationId = "";
+
+                var boxResponse = await firebaseClient
+                    .Child("Box")
+                    .OrderBy("id")
+                    .EqualTo(boxId)
+                    .OnceAsync<Object>();
+
+                foreach (var item in boxResponse)
+                {
+                    dynamic value = item.Object;
+                    cabinetId = value.cabinetId;
+                    break;
+                }
+
+                var cabinetResponse = await firebaseClient
+                    .Child("Cabinet")
+                    .OrderBy("id")
+                    .EqualTo(cabinetId)
+                    .OnceAsync<Object>();
+
+                foreach (var item in cabinetResponse)
+                {
+                    dynamic value = item.Object;
+                    locationId = value.locationId;
+                    break;
+                }
+
+                var locationResponse = await firebaseClient
+                    .Child("Location")
+                    .OrderBy("id")
+                    .EqualTo(locationId)
+                    .OnceAsync<Object>();
+
+                foreach (var item in locationResponse)
+                {
+                    dynamic value = item.Object;
+                    locationName = value.nameLocation;
+                    break;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex);
+            }
+            
+            return locationName;
+        }
+
         private async Task<Box> GetAvailableBoxByCabinetId(string? cabinetId)
         {
             Box box = new();
+
             try
             {
                 var response = await firebaseClient
