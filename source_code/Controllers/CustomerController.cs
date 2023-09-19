@@ -136,9 +136,9 @@ namespace DeliverBox_BE.Controllers
                 string bookingId = await CreateNewBooking(model, newUnlockCode);
                 string bookingCode = await CreateNewBookingCode(bookingId);
                 string logId = await CreateNewBookingLog(bookingId, logTitle, logBody);
-                bool updateBoxStatus = await UpdateBoxStatus(model.BoxId);
+                bool updateBoxStatus = await UpdateBoxProcess(model.BoxId, 2);
 
-                if (bookingId != null && bookingCode != null && logId != null && updateBoxStatus)
+                if (bookingId != null && bookingCode != null && logId != null)
                 {
                     Dictionary<string, dynamic> dict = new()
                     {
@@ -241,7 +241,7 @@ namespace DeliverBox_BE.Controllers
 
                 var newBookingStatus = new Dictionary<string, dynamic> { { "status", 5 }, };
 
-                var newBoxStatus = new Dictionary<string, dynamic> { { "status", 1 }, };
+                var newBoxProcess = new Dictionary<string, dynamic> { { "process", 0 }, };
 
                 await firebaseClient
                   .Child("BookingOrder")
@@ -251,7 +251,7 @@ namespace DeliverBox_BE.Controllers
                 await firebaseClient
                   .Child("Box")
                   .Child(model.BoxId)
-                  .PatchAsync(newBoxStatus);
+                  .PatchAsync(newBoxProcess);
 
                 Dictionary<string, dynamic> result = new()
                 {
@@ -454,6 +454,7 @@ namespace DeliverBox_BE.Controllers
                     {
                         id = value.id
                     };
+
                     list.Add(cabinet);
                 }
             }
@@ -462,7 +463,6 @@ namespace DeliverBox_BE.Controllers
                 Debug.WriteLine(ex);
             }
 
-            //Debug.WriteLine($"Cabinet list: {list.Count()}");
             return list;
         }
 
@@ -533,13 +533,14 @@ namespace DeliverBox_BE.Controllers
                     .Child("Box")
                     .OrderBy("cabinetId")
                     .EqualTo(cabinetId)
-                    .OnceAsync<Box>();
+                    .OnceAsync<Object>();
 
                 foreach (var item in response)
                 {
                     dynamic value = item.Object;
                     int status = (int)(long)value.status;
-                    if (status == 1)
+                    int process = (int)(long)value.process;
+                    if (status == 1 && process == 0)
                     {
                         box.id = value.id;
                         box.nameBox = value.nameBox;
@@ -764,12 +765,13 @@ namespace DeliverBox_BE.Controllers
             return logId;
         }
 
-        private async Task<bool> UpdateBoxStatus(string boxId)
+        private async Task<bool> UpdateBoxProcess(string boxId, int inputProcess)
         {
             bool isUpdate = false;
+
             try
             {
-                var newStatus = new Dictionary<string, dynamic>{ { "status", 0 }, };
+                var newStatus = new Dictionary<string, dynamic>{ { "process", inputProcess }, };
 
                 await firebaseClient
                     .Child("Box")
