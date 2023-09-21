@@ -175,7 +175,7 @@ namespace DeliverBox_BE.Controllers
 
         [HttpGet(template: "get-active-booking")]
         [Authorize]
-        public async Task<ActionResult> FetchActiveBooking(string deviceId)
+        public async Task<ActionResult> FetchActiveBooking(string deviceId, string businessId)
         {
             try
             {
@@ -190,11 +190,14 @@ namespace DeliverBox_BE.Controllers
                 foreach (var item in response)
                 {
                     dynamic value = item.Object;
-                    if (value.status == 2 || value.status == 3)
+                    int status = (int)(long)value.status;
+                    string foundBusinessId = (string)value.businessId;
+
+                    if (foundBusinessId == businessId && (value.status == 2 || value.status == 3))
                     {
                         string locationName = await GetLocationByBoxId((string)value.boxId);
 
-                        ActiveBookingResponseModel model = new()
+                        ActiveBookingResponseModel responseModel = new()
                         {
                             BookingId = value.id,
                             BoxId = value.boxId,
@@ -206,7 +209,7 @@ namespace DeliverBox_BE.Controllers
                             BookingCode = await GetLastBookingCodeByBookingId((string)value.id)
                         };
 
-                        list.Add(model);
+                        list.Add(responseModel);
                     }
                 }
 
@@ -348,7 +351,7 @@ namespace DeliverBox_BE.Controllers
 
         [HttpGet(template: "get-booking-history")]
         [Authorize]
-        public async Task<ActionResult> FetchBookingHistory(string deviceId)
+        public async Task<ActionResult> FetchBookingHistory(string deviceId, string businessId)
         {
             try
             {
@@ -356,14 +359,17 @@ namespace DeliverBox_BE.Controllers
                 .Child("BookingOrder")
                 .OrderBy("deviceId")
                 .EqualTo(deviceId)
-                .OnceAsync<Object>();
+                .OnceAsync<object>();
 
-                List<Object> list = new();
+                List<object> list = new();
 
                 foreach (var item in response)
                 {
                     dynamic value = item.Object;
-                    if (value.status == 4 || value.status == 5)
+                    int status = (int)(long)value.status;
+                    string foundBusinessId = (string)value.businessId;
+
+                    if (foundBusinessId == businessId &&  (status == 4 || status == 5))
                     {
                         string locationName = await GetLocationByBoxId((string)value.boxId);
 
@@ -375,6 +381,7 @@ namespace DeliverBox_BE.Controllers
                             Location = locationName,
                             BoxName = await GetBoxNameById((string)value.boxId)
                         };
+
                         list.Add(model);
                     }
                 }
@@ -472,48 +479,23 @@ namespace DeliverBox_BE.Controllers
 
             try
             {
-                string cabinetId = "";
-                string locationId = "";
-
-                var boxResponse = await firebaseClient
+                string cabinetId = await firebaseClient
                     .Child("Box")
-                    .OrderBy("id")
-                    .EqualTo(boxId)
-                    .OnceAsync<Object>();
+                    .Child(boxId)
+                    .Child("cabinetId")
+                    .OnceSingleAsync<string>();
 
-                foreach (var item in boxResponse)
-                {
-                    dynamic value = item.Object;
-                    cabinetId = value.cabinetId;
-                    break;
-                }
-
-                var cabinetResponse = await firebaseClient
+                string locationId = await firebaseClient
                     .Child("Cabinet")
-                    .OrderBy("id")
-                    .EqualTo(cabinetId)
-                    .OnceAsync<Object>();
+                    .Child(cabinetId)
+                    .Child("locationId")
+                    .OnceSingleAsync<string>();
 
-                foreach (var item in cabinetResponse)
-                {
-                    dynamic value = item.Object;
-                    locationId = value.locationId;
-                    break;
-                }
-
-                var locationResponse = await firebaseClient
+                locationName = await firebaseClient
                     .Child("Location")
-                    .OrderBy("id")
-                    .EqualTo(locationId)
-                    .OnceAsync<Object>();
-
-                foreach (var item in locationResponse)
-                {
-                    dynamic value = item.Object;
-                    locationName = value.nameLocation;
-                    break;
-                }
-
+                    .Child(locationId)
+                    .Child("nameLocation")
+                    .OnceSingleAsync<string>();
             }
             catch (Exception ex)
             {
@@ -571,6 +553,7 @@ namespace DeliverBox_BE.Controllers
                 {
                     dynamic value = item.Object;
                     boxName = (string)value.nameBox;
+                    break;
                 }
             }
             catch (Exception ex)
@@ -584,6 +567,7 @@ namespace DeliverBox_BE.Controllers
         private async Task<string> GetLastBookingCodeByBookingId(string? inputbookingId)
         {
             string bookingCode = "";
+
             try
             {
                 var response = await firebaseClient
@@ -598,6 +582,7 @@ namespace DeliverBox_BE.Controllers
                     if (bookingId == inputbookingId)
                     {
                         bookingCode = (string)value.bcode;
+                        break;
                     }
                 }
             }
