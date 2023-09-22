@@ -7,6 +7,7 @@ using System.Diagnostics;
 using DeliverBox_BE.Objects;
 using DeliverBox_BE.Utils;
 using Microsoft.AspNetCore.Authorization;
+using Newtonsoft.Json.Linq;
 
 namespace DeliverBox_BE.Controllers
 {
@@ -195,18 +196,17 @@ namespace DeliverBox_BE.Controllers
 
                     if (foundBusinessId == businessId && (value.status == 2 || value.status == 3))
                     {
-                        string locationName = await GetLocationByBoxId((string)value.boxId);
+                        string boxName = await GetBoxNameById((string)value.boxId);
+                        string cabinetName = await GetCabinetNameByBoxId((string)value.boxId);
 
                         ActiveBookingResponseModel responseModel = new()
                         {
                             BookingId = value.id,
                             BoxId = value.boxId,
+                            BoxName = boxName,
+                            CabinetName = cabinetName,
                             ValidDate = value.validDate,
-                            Location = locationName,
                             Status = value.status,
-                            UnlockCode = value.unlockCode,
-                            BoxName = await GetBoxNameById((string)value.boxId),
-                            BookingCode = await GetLastBookingCodeByBookingId((string)value.id)
                         };
 
                         list.Add(responseModel);
@@ -231,6 +231,55 @@ namespace DeliverBox_BE.Controllers
             }
         }
 
+        [HttpGet(template: "get-booking-details")]
+        //[Authorize]
+        public async Task<ActionResult> FetchBookingDetails(string bookingId, string boxId)
+        {
+            try
+            {
+                BookingDetailsResponseModel responseModel = new();
+
+                var response = await firebaseClient
+                    .Child("BookingOrder")
+                    .OrderBy("id")
+                    .EqualTo(bookingId)
+                    .OnceAsync<Object>();
+
+                foreach (var item in response)
+                {
+                    dynamic value = item.Object;
+
+                    string unlockCode = value.unlockCode;
+                    string locationName = await GetLocationByBoxId(boxId);
+                    string bookingCode = await GetLastBookingCodeByBookingId(bookingId);
+
+                    responseModel.location = locationName;
+                    responseModel.bookingCode = bookingCode;
+                    responseModel.unlockCode = unlockCode;
+                }
+
+                Dictionary<string, dynamic> result = new ()
+                {
+                    { "location", responseModel.location!},
+                    { "bookingCode", responseModel.bookingCode!},
+                    { "unlockCode", responseModel.unlockCode!},
+                    { "errorCode", 0},
+                    { "errMessage", "Lấy booking details thành công"},
+                };
+
+                var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+
+                //Json convert
+                return Content(json, "application/json");
+            }
+            catch (Exception ex)
+            {
+                var result = new { errCode = 1, errMessage = ex.Message };
+                var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                return Content(json, "application/json");
+            }
+        }
+
         [HttpPost(template: "cancel-processing-booking")]
         [Authorize]
         public async Task<ActionResult> CancelProcessingBooking([FromBody] CancelProcessingBookingModel model)
@@ -238,7 +287,7 @@ namespace DeliverBox_BE.Controllers
             try
             {
                 DateTime currentTime = TimeZoneInfo.ConvertTime(DateTime.Now, TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"));
-                string cancelDate = currentTime.ToString("yyyy-MM-dd HH:mm");
+                string cancelDate = currentTime.ToString("HH:mm - dd/MM/yyyy");
                 string logTitle = "Hủy booking";
                 string logBody = $"Booking được hủy vào ngày: {cancelDate}";
 
@@ -371,14 +420,11 @@ namespace DeliverBox_BE.Controllers
 
                     if (foundBusinessId == businessId &&  (status == 4 || status == 5))
                     {
-                        string locationName = await GetLocationByBoxId((string)value.boxId);
-
                         BookingHistoryResponseModel model = new()
                         {
                             ValidDate = value.validDate,
                             CreateDate = value.createDate,
                             Status = value.status,
-                            Location = locationName,
                             BoxName = await GetBoxNameById((string)value.boxId)
                         };
 
@@ -471,6 +517,32 @@ namespace DeliverBox_BE.Controllers
             }
 
             return list;
+        }
+
+        private async Task<string> GetCabinetNameByBoxId(string? boxId)
+        {
+            string cabinetName = "";
+
+            try
+            {
+                string cabinetId = await firebaseClient
+                    .Child("Box")
+                    .Child(boxId)
+                    .Child("cabinetId")
+                    .OnceSingleAsync<string>();
+
+                cabinetName = await firebaseClient
+                    .Child("Cabinet")
+                    .Child(cabinetId)
+                    .Child("nameCabinet")
+                    .OnceSingleAsync<string>();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex);
+            }
+
+            return cabinetName;
         }
 
         private async Task<string> GetLocationByBoxId(string boxId)
@@ -582,7 +654,6 @@ namespace DeliverBox_BE.Controllers
                     if (bookingId == inputbookingId)
                     {
                         bookingCode = (string)value.bcode;
-                        break;
                     }
                 }
             }
@@ -601,7 +672,7 @@ namespace DeliverBox_BE.Controllers
             try
             {
                 DateTime currentTime = TimeZoneInfo.ConvertTime(DateTime.Now, TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"));
-                string createDate = currentTime.ToString("yyyy-MM-dd HH:mm");
+                string createDate = currentTime.ToString("HH:mm - dd/MM/yyyy");
 
                 var data = new Dictionary<string, dynamic>
                 {
@@ -681,7 +752,7 @@ namespace DeliverBox_BE.Controllers
             try
             {
                 DateTime currentTime = TimeZoneInfo.ConvertTime(DateTime.Now.AddMinutes(10.0), TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"));
-                string validDate = currentTime.ToString("yyyy-MM-dd HH:mm");
+                string validDate = currentTime.ToString("HH:mm - dd/MM/yyyy");
 
                 RandomDigits randomDigits = new();
                 newBookingCode = randomDigits.GenerateRandomCode();
@@ -719,7 +790,7 @@ namespace DeliverBox_BE.Controllers
             try
             {
                 DateTime currentTime = TimeZoneInfo.ConvertTime(DateTime.Now, TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"));
-                string createDate = currentTime.ToString("yyyy-MM-dd HH:mm");
+                string createDate = currentTime.ToString("HH:mm - dd/MM/yyyy");
 
                 var data = new Dictionary<string, dynamic>
                 {
