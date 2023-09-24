@@ -287,7 +287,7 @@ namespace DeliverBox_BE.Controllers
             try
             {
                 DateTime currentTime = TimeZoneInfo.ConvertTime(DateTime.Now, TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"));
-                string cancelDate = currentTime.ToString("HH:mm - dd/MM/yyyy");
+                string cancelDate = currentTime.ToString("yyyy/MM/dd HH:mm:ss");
                 string logTitle = "Hủy booking";
                 string logBody = $"Booking được hủy vào ngày: {cancelDate}";
 
@@ -672,7 +672,7 @@ namespace DeliverBox_BE.Controllers
             try
             {
                 DateTime currentTime = TimeZoneInfo.ConvertTime(DateTime.Now, TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"));
-                string createDate = currentTime.ToString("HH:mm - dd/MM/yyyy");
+                string createDate = currentTime.ToString("yyyy/MM/dd HH:mm:ss");
 
                 var data = new Dictionary<string, dynamic>
                 {
@@ -752,7 +752,7 @@ namespace DeliverBox_BE.Controllers
             try
             {
                 DateTime currentTime = TimeZoneInfo.ConvertTime(DateTime.Now.AddMinutes(10.0), TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"));
-                string validDate = currentTime.ToString("HH:mm - dd/MM/yyyy");
+                string validDate = currentTime.ToString("yyyy/MM/dd HH:mm:ss");
 
                 RandomDigits randomDigits = new();
                 newBookingCode = randomDigits.GenerateRandomCode();
@@ -790,7 +790,7 @@ namespace DeliverBox_BE.Controllers
             try
             {
                 DateTime currentTime = TimeZoneInfo.ConvertTime(DateTime.Now, TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"));
-                string createDate = currentTime.ToString("HH:mm - dd/MM/yyyy");
+                string createDate = currentTime.ToString("yyyy/MM/dd HH:mm:ss");
 
                 var data = new Dictionary<string, dynamic>
                 {

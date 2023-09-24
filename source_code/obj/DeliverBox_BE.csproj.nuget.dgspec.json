@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "M:\\GitHub\\capstone-project-admin-backend\\source_code\\DeliverBox_BE.csproj": {}
+    "D:\\GitHub\\capstone-project-admin-backend\\source_code\\DeliverBox_BE.csproj": {}
   },
   "projects": {
-    "M:\\GitHub\\capstone-project-admin-backend\\source_code\\DeliverBox_BE.csproj": {
+    "D:\\GitHub\\capstone-project-admin-backend\\source_code\\DeliverBox_BE.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "M:\\GitHub\\capstone-project-admin-backend\\source_code\\DeliverBox_BE.csproj",
+        "projectUniqueName": "D:\\GitHub\\capstone-project-admin-backend\\source_code\\DeliverBox_BE.csproj",
         "projectName": "DeliverBox_BE",
-        "projectPath": "M:\\GitHub\\capstone-project-admin-backend\\source_code\\DeliverBox_BE.csproj",
-        "packagesPath": "C:\\Users\\Sworcerer.SWORCERER\\.nuget\\packages\\",
-        "outputPath": "M:\\GitHub\\capstone-project-admin-backend\\source_code\\obj\\",
+        "projectPath": "D:\\GitHub\\capstone-project-admin-backend\\source_code\\DeliverBox_BE.csproj",
+        "packagesPath": "C:\\Users\\IamDell\\.nuget\\packages\\",
+        "outputPath": "D:\\GitHub\\capstone-project-admin-backend\\source_code\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\Sworcerer.SWORCERER\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\IamDell\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -22,7 +22,6 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\sdk\\7.0.306\\Sdks\\Microsoft.NET.Sdk.Web\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -106,11 +105,16 @@
             "net47",
             "net471",
             "net472",
-            "net48",
-            "net481"
+            "net48"
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.NETCore.App.Host.win-x64",
+              "version": "[6.0.11, 6.0.11]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.AspNetCore.App": {
               "privateAssets": "none"
@@ -119,7 +123,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.306\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.306\\RuntimeIdentifierGraph.json"
         }
       }
     }
