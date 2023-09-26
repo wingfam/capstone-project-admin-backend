@@ -273,6 +273,31 @@ namespace DeliverCabinet_BE.Controllers
                         box.status = 1;
                         response = client.Update("Box/" + box.id, box); //Update to firebase
                     }
+                } else if (cabinet.status == 0)
+                {
+                    //Set Box to unavaiable
+                    response = client.Get("Box");
+                    dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+
+                    var list = new List<Box>();
+                    var temp = new Box();
+                    if (data != null)
+                    {
+                        foreach (var item in data)
+                        {
+                            temp = JsonConvert.DeserializeObject<Box>(((JProperty)item).Value.ToString());
+                            if (temp.cabinetId == id)
+                            {
+                                list.Add(temp);
+                            }
+                        }
+                    }
+
+                    foreach (var box in list)
+                    {
+                        box.status = 0;
+                        response = client.Update("Box/" + box.id, box); //Update to firebase
+                    }
                 }
 
                 var result = new { errCode = 0, errMessage = "Success" };
@@ -306,11 +331,16 @@ namespace DeliverCabinet_BE.Controllers
                 dynamic data = JsonConvert.DeserializeObject<dynamic>(response.Body);
 
                 var list = new List<Box>();
+                var temp = new Box();
                 if (data != null)
                 {
                     foreach (var item in data)
                     {
-                        list.Add(JsonConvert.DeserializeObject<Box>(((JProperty)item).Value.ToString()));
+                        temp = JsonConvert.DeserializeObject<Box>(((JProperty)item).Value.ToString());
+                        if (temp.cabinetId == id)
+                        {
+                            list.Add(temp);
+                        }
                     }
                 }
 

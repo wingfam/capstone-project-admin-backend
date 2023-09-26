@@ -8,6 +8,7 @@ using DeliverBox_BE.Objects;
 using DeliverBox_BE.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Newtonsoft.Json.Linq;
+using System.Xml.Linq;
 
 namespace DeliverBox_BE.Controllers
 {
@@ -231,8 +232,64 @@ namespace DeliverBox_BE.Controllers
             }
         }
 
+        [HttpGet(template: "get-booking-history")]
+        [Authorize]
+        public async Task<ActionResult> FetchBookingHistory(string deviceId, string businessId)
+        {
+            try
+            {
+                var response = await firebaseClient
+                .Child("BookingOrder")
+                .OrderBy("deviceId")
+                .EqualTo(deviceId)
+                .OnceAsync<object>();
+
+                List<object> list = new();
+
+                foreach (var item in response)
+                {
+                    dynamic value = item.Object;
+                    int status = (int)(long)value.status;
+                    string foundBusinessId = (string)value.businessId;
+                    string boxName = await GetBoxNameById((string)value.boxId);
+                    string cabinetName = await GetCabinetNameByBoxId((string)value.boxId);
+
+                    if (foundBusinessId == businessId && (status == 4 || status == 5))
+                    {
+                        BookingHistoryResponseModel model = new()
+                        {
+                            BookingId = value.id,
+                            BoxId = value.boxId,
+                            CabinetName = cabinetName,
+                            BoxName = boxName,
+                            ValidDate = value.validDate,
+                            Status = value.status,
+                        };
+
+                        list.Add(model);
+                    }
+                }
+
+                Dictionary<string, dynamic> dict = new()
+                {
+                    { "data", list }
+                };
+
+                var json = JsonConvert.SerializeObject(dict, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+
+                //Json convert
+                return Content(json, "application/json");
+            }
+            catch (Exception ex)
+            {
+                var result = new { errCode = 1, errMessage = ex.Message };
+                var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                return Content(json, "application/json");
+            }
+        }
+
         [HttpGet(template: "get-booking-details")]
-        //[Authorize]
+        [Authorize]
         public async Task<ActionResult> FetchBookingDetails(string bookingId, string boxId)
         {
             try
@@ -398,58 +455,6 @@ namespace DeliverBox_BE.Controllers
             }
         }
 
-        [HttpGet(template: "get-booking-history")]
-        [Authorize]
-        public async Task<ActionResult> FetchBookingHistory(string deviceId, string businessId)
-        {
-            try
-            {
-                var response = await firebaseClient
-                .Child("BookingOrder")
-                .OrderBy("deviceId")
-                .EqualTo(deviceId)
-                .OnceAsync<object>();
-
-                List<object> list = new();
-
-                foreach (var item in response)
-                {
-                    dynamic value = item.Object;
-                    int status = (int)(long)value.status;
-                    string foundBusinessId = (string)value.businessId;
-
-                    if (foundBusinessId == businessId &&  (status == 4 || status == 5))
-                    {
-                        BookingHistoryResponseModel model = new()
-                        {
-                            ValidDate = value.validDate,
-                            CreateDate = value.createDate,
-                            Status = value.status,
-                            BoxName = await GetBoxNameById((string)value.boxId)
-                        };
-
-                        list.Add(model);
-                    }
-                }
-
-                Dictionary<string, dynamic> dict = new()
-                {
-                    { "data", list }
-                };
-
-                var json = JsonConvert.SerializeObject(dict, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
-
-                //Json convert
-                return Content(json, "application/json");
-            }
-            catch (Exception ex)
-            {
-                var result = new { errCode = 1, errMessage = ex.Message };
-                var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
-                return Content(json, "application/json");
-            }
-        }
-
         [HttpGet(template: "get-notification")]
         [Authorize]
         public async Task<ActionResult> FetchNotification(string deviceId)
@@ -492,6 +497,7 @@ namespace DeliverBox_BE.Controllers
         private async Task<List<Cabinet>> GetCabinetByLocationId(string? locationId)
         {
             var list = new List<Cabinet>();
+
             try
             {
                 var response = await firebaseClient
@@ -503,12 +509,18 @@ namespace DeliverBox_BE.Controllers
                 foreach (var item in response)
                 {
                     dynamic value = item.Object;
-                    Cabinet cabinet = new()
-                    {
-                        id = value.id
-                    };
+                    int status = (int)(long)value.status;
 
-                    list.Add(cabinet);
+                    if (status == 1)
+                    {
+                        Cabinet cabinet = new()
+                        {
+                            id = value.id
+                        };
+
+                        list.Add(cabinet);
+                    }
+                    
                 }
             }
             catch (Exception ex)
