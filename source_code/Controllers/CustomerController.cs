@@ -176,7 +176,7 @@ namespace DeliverBox_BE.Controllers
         }
 
         [HttpGet(template: "get-active-booking")]
-        [Authorize]
+        //[Authorize]
         public async Task<ActionResult> FetchActiveBooking(string deviceId, string businessId)
         {
             try
@@ -344,7 +344,7 @@ namespace DeliverBox_BE.Controllers
             try
             {
                 DateTime currentTime = TimeZoneInfo.ConvertTime(DateTime.Now, TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"));
-                string cancelDate = currentTime.ToString("yyyy/MM/dd HH:mm:ss");
+                string cancelDate = currentTime.ToString("yyyy-MM-dd HH:mm");
                 string logTitle = "Hủy booking";
                 string logBody = $"Booking được hủy vào ngày: {cancelDate}";
 
@@ -684,7 +684,7 @@ namespace DeliverBox_BE.Controllers
             try
             {
                 DateTime currentTime = TimeZoneInfo.ConvertTime(DateTime.Now, TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"));
-                string createDate = currentTime.ToString("yyyy/MM/dd HH:mm:ss");
+                string createDate = currentTime.ToString("yyyy-MM-dd HH:mm");
 
                 var data = new Dictionary<string, dynamic>
                 {
@@ -764,7 +764,7 @@ namespace DeliverBox_BE.Controllers
             try
             {
                 DateTime currentTime = TimeZoneInfo.ConvertTime(DateTime.Now.AddMinutes(10.0), TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"));
-                string validDate = currentTime.ToString("yyyy/MM/dd HH:mm:ss");
+                string validDate = currentTime.ToString("yyyy-MM-dd HH:mm");
 
                 RandomDigits randomDigits = new();
                 newBookingCode = randomDigits.GenerateRandomCode();
@@ -802,7 +802,7 @@ namespace DeliverBox_BE.Controllers
             try
             {
                 DateTime currentTime = TimeZoneInfo.ConvertTime(DateTime.Now, TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"));
-                string createDate = currentTime.ToString("yyyy/MM/dd HH:mm:ss");
+                string createDate = currentTime.ToString("yyyy-MM-dd HH:mm");
 
                 var data = new Dictionary<string, dynamic>
                 {
