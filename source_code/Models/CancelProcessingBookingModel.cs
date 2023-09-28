@@ -2,7 +2,8 @@
 {
     public class CancelProcessingBookingModel
     {
-        public string? BookingId { get; set; }
-        public string? BoxId { get; set; }
+        public string? bookingId { get; set; }
+        public string? oldBookingCode { get; set; }
+        public string? boxId { get; set; }
     }
 }

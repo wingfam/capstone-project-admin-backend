@@ -95,7 +95,7 @@ namespace DeliverBox_BE.Controllers
                                 { "nameBox", availableBox.nameBox! },
                                 { "status", availableBox.status! },
                                 { "errCode", 0 },
-                                { "errMessage", "Success" },
+                                { "errMessage", "Get Available Box Success" },
                             };
 
                             result = dict;
@@ -338,7 +338,7 @@ namespace DeliverBox_BE.Controllers
         }
 
         [HttpPost(template: "cancel-processing-booking")]
-        [Authorize]
+        //[Authorize]
         public async Task<ActionResult> CancelProcessingBooking([FromBody] CancelProcessingBookingModel model)
         {
             try
@@ -354,21 +354,22 @@ namespace DeliverBox_BE.Controllers
 
                 await firebaseClient
                   .Child("BookingOrder")
-                  .Child(model.BookingId)
+                  .Child(model.bookingId)
                   .PatchAsync(newBookingStatus);
 
                 await firebaseClient
                   .Child("Box")
-                  .Child(model.BoxId)
+                  .Child(model.boxId)
                   .PatchAsync(newBoxProcess);
 
                 Dictionary<string, dynamic> result = new()
                 {
                     { "errCode", 0 },
-                    { "errMessage", $"Booking {model.BookingId} được hủy vào ngày: {cancelDate}" }
+                    { "errMessage", $"Booking {model.bookingId} được hủy vào ngày: {cancelDate}" }
                 };
 
-                await CreateNewBookingLog(model.BookingId!, logTitle, logBody);
+                await DisableOldBookingCode(model.oldBookingCode!);
+                await CreateNewBookingLog(model.bookingId!, logTitle, logBody);
 
                 var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
 
@@ -429,23 +430,41 @@ namespace DeliverBox_BE.Controllers
         {
             try
             {
-                var newBookingCode = await CreateNewBookingCode(request.BookingId!);
-                string logTitle = "Tạo mã booking";
-                string logBody = $"Mã booking {newBookingCode} được tạo thành công";
+                bool isDisable = await DisableOldBookingCode(request.oldBookingCode!);
 
-                await CreateNewBookingLog(request.BookingId!, logTitle, logBody);
-
-                Dictionary<string, dynamic> result = new()
+                if (isDisable)
                 {
-                    { "bookingCode", newBookingCode },
-                    { "errCode", 0 },
-                    { "errMessage", $"Mã booking mới {newBookingCode} được tạo thành công" }
-                };
+                    var newBookingCode = await CreateNewBookingCode(request.bookingId!);
+                    string logTitle = "Tạo mã booking";
+                    string logBody = $"Mã booking {newBookingCode} được tạo thành công";
 
-                var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                    await CreateNewBookingLog(request.bookingId!, logTitle, logBody);
 
-                //Json convert
-                return Content(json, "application/json");
+                    Dictionary<string, dynamic> result = new()
+                    {
+                        { "bookingCode", newBookingCode },
+                        { "errCode", 0 },
+                        { "errMessage", $"Mã booking mới {newBookingCode} được tạo thành công" }
+                    };
+
+                    var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+
+                    //Json convert
+                    return Content(json, "application/json");
+                }
+                else
+                {
+                    Dictionary<string, dynamic> result = new()
+                    {
+                        { "errCode", 1 },
+                        { "errMessage", $"Mã booking mới không tạo được" }
+                    };
+
+                    var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+
+                    //Json convert
+                    return Content(json, "application/json");
+                }
             }
             catch (Exception ex)
             {
@@ -611,6 +630,7 @@ namespace DeliverBox_BE.Controllers
                         box.id = value.id;
                         box.nameBox = value.nameBox;
                         box.status = value.status;
+                        break;
                     }
                 }
             }
@@ -756,6 +776,44 @@ namespace DeliverBox_BE.Controllers
             }
 
             return isDeactivate;
+        }
+
+        private async Task<bool> DisableOldBookingCode(string oldBookingCode)
+        {
+            bool isDisable = false;
+
+            try
+            {
+                var newStatus = new Dictionary<string, dynamic>
+                {
+                    { "status", 0 },
+                };
+
+                var response = await firebaseClient
+                    .Child("BookingCode")
+                    .OrderBy("bcode")
+                    .EqualTo(oldBookingCode)
+                    .OnceAsync<Object>();
+
+                foreach (var item in response)
+                {
+                    dynamic value = item.Object;
+                    string bookingCodeId = (string)value.id;
+                    await firebaseClient
+                        .Child("BookingCode")
+                        .Child(bookingCodeId)
+                        .PatchAsync(newStatus);
+
+                    isDisable = true;
+                    break;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex);
+            }
+
+            return isDisable;
         }
 
         private async Task<string> CreateNewBookingCode(string bookingId)
