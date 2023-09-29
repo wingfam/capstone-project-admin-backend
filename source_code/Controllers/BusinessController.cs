@@ -146,10 +146,75 @@ namespace MailBoxTest.Controllers
 
             try
             {
-                var business = JsonConvert.DeserializeObject<dynamic>(response.Body);
+                var business = JsonConvert.DeserializeObject<Business>(response.Body);
 
-                business.isAvaiable = false; //Delede = Change status to false
+                business.status = 0; //Delede = Change status to false
                 response = await client.UpdateAsync("Business/" + business.id, business);
+
+                response = client.Get("Cabinet");
+                data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+
+                //Change Cabinet status
+                var cabinets = new List<Cabinet>();
+                var tempCabi = new Cabinet();
+                if(data != null)
+                {
+                    foreach(var item in data)
+                    {
+                        tempCabi = JsonConvert.DeserializeObject<Cabinet>(((JProperty)item).Value.ToString());
+                        if (tempCabi.businessId == id)
+                        {
+                            cabinets.Add(tempCabi);
+                        }
+                    }
+                }
+                foreach(var cabinet in cabinets)
+                {
+                    cabinet.status = 0;
+                    response = client.Update("Cabinet/" + cabinet.id, cabinet);
+
+                    var list = new List<Box>();
+                    var tempBox = new Box();
+                    if (data != null)
+                    {
+                        foreach (var item in data)
+                        {
+                            tempBox = JsonConvert.DeserializeObject<Box>(((JProperty)item).Value.ToString());
+                            if (tempBox.cabinetId == cabinet.id)
+                            {
+                                list.Add(tempBox);
+                            }
+                        }
+                    }
+
+                    foreach (var box in list)
+                    {
+                        box.status = 0;
+                        response = client.Update("Box/" + box.id, box); //Update to firebase
+                    }
+                }
+
+                //Change Location status
+                response = client.Get("Location");
+                data = JsonConvert.DeserializeObject<dynamic>(response.Body);
+                var locations = new List<Location>();
+                var tempLoca = new Location();
+                if(data != null)
+                {
+                    foreach(var item in data)
+                    {
+                        tempLoca = JsonConvert.DeserializeObject<Location>(((JProperty)item).Value.ToString());
+                        if(tempLoca.businessId == id)
+                        {
+                            locations.Add(tempLoca);
+                        }
+                    }
+                }
+                foreach (var location in locations)
+                {
+                    location.status = 0;
+                    response = client.Update("Location/" + location.id, location);
+                }
 
                 var result = new { errCode = 0, errMessage = "Success" };
                 var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });

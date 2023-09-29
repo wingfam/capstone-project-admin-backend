@@ -27,6 +27,47 @@ namespace DeliverBox_BE.Controllers
                 AuthTokenAsyncFactory = () => Task.FromResult(secret)
             });
 
+        [HttpGet(template: "get-available-business")]
+        public async Task<ActionResult> GetAvailableBusiness()
+        {
+            try
+            {
+                var response = await firebaseClient
+                .Child("Business")
+                .OrderBy("businessName")
+                .OnceAsync<Object>();
+
+                List<Object> list = new();
+
+                foreach (var item in response)
+                {
+                    dynamic value = item.Object;
+                    int status = (int)(long)value.status;
+                    if (status == 1)
+                    {
+                        GetAvailableBusinessModel model = new();
+                        model.id = value.id;
+                        model.businessName = value.businessName;
+                        list.Add(model);
+                    }
+                }
+
+                Dictionary<string, dynamic> dict = new()
+                {
+                    { "data", list }
+                };
+
+                var json = JsonConvert.SerializeObject(dict, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                return Content(json, "application/json");
+            }
+            catch (Exception ex)
+            {
+                var result = new { errCode = 1, errMessage = ex.Message };
+                var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                return Content(json, "application/json");
+            }
+        }
+
         [HttpGet(template: "search-location-by-businessId")]
         [Authorize]
         public async Task<ActionResult> SearchLocationByBusinessId(string businessId)
@@ -43,11 +84,15 @@ namespace DeliverBox_BE.Controllers
 
                 foreach (var item in response)
                 {
-                    LocationNamesModel model = new();
                     dynamic value = item.Object;
-                    model.Name = value.nameLocation;
-                    model.Id = value.id;
-                    list.Add(model);
+                    int status = (int)(long)value.status;
+                    if (status == 1)
+                    {
+                        LocationNamesModel model = new();
+                        model.Id = value.id;
+                        model.Name = value.nameLocation;
+                        list.Add(model);
+                    }
                 }
 
                 Dictionary<string, dynamic> dict = new()
@@ -95,7 +140,7 @@ namespace DeliverBox_BE.Controllers
                                 { "nameBox", availableBox.nameBox! },
                                 { "status", availableBox.status! },
                                 { "errCode", 0 },
-                                { "errMessage", "Success" },
+                                { "errMessage", "Get Available Box Success" },
                             };
 
                             result = dict;
@@ -176,7 +221,7 @@ namespace DeliverBox_BE.Controllers
         }
 
         [HttpGet(template: "get-active-booking")]
-        //[Authorize]
+        [Authorize]
         public async Task<ActionResult> FetchActiveBooking(string deviceId, string businessId)
         {
             try
@@ -251,7 +296,7 @@ namespace DeliverBox_BE.Controllers
                     dynamic value = item.Object;
                     int status = (int)(long)value.status;
                     string foundBusinessId = (string)value.businessId;
-                    string boxName = await GetBoxNameById((string)value.boxId);
+                    //string boxName = await GetBoxNameById((string)value.boxId);
                     string cabinetName = await GetCabinetNameByBoxId((string)value.boxId);
 
                     if (foundBusinessId == businessId && (status == 4 || status == 5))
@@ -261,7 +306,7 @@ namespace DeliverBox_BE.Controllers
                             BookingId = value.id,
                             BoxId = value.boxId,
                             CabinetName = cabinetName,
-                            BoxName = boxName,
+                            //BoxName = boxName,
                             ValidDate = value.validDate,
                             Status = value.status,
                         };
@@ -354,21 +399,22 @@ namespace DeliverBox_BE.Controllers
 
                 await firebaseClient
                   .Child("BookingOrder")
-                  .Child(model.BookingId)
+                  .Child(model.bookingId)
                   .PatchAsync(newBookingStatus);
 
                 await firebaseClient
                   .Child("Box")
-                  .Child(model.BoxId)
+                  .Child(model.boxId)
                   .PatchAsync(newBoxProcess);
 
                 Dictionary<string, dynamic> result = new()
                 {
                     { "errCode", 0 },
-                    { "errMessage", $"Booking {model.BookingId} được hủy vào ngày: {cancelDate}" }
+                    { "errMessage", $"Booking {model.bookingId} được hủy vào ngày: {cancelDate}" }
                 };
 
-                await CreateNewBookingLog(model.BookingId!, logTitle, logBody);
+                await DisableOldBookingCode(model.oldBookingCode!);
+                await CreateNewBookingLog(model.bookingId!, logTitle, logBody);
 
                 var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
 
@@ -429,23 +475,41 @@ namespace DeliverBox_BE.Controllers
         {
             try
             {
-                var newBookingCode = await CreateNewBookingCode(request.BookingId!);
-                string logTitle = "Tạo mã booking";
-                string logBody = $"Mã booking {newBookingCode} được tạo thành công";
+                bool isDisable = await DisableOldBookingCode(request.oldBookingCode!);
 
-                await CreateNewBookingLog(request.BookingId!, logTitle, logBody);
-
-                Dictionary<string, dynamic> result = new()
+                if (isDisable)
                 {
-                    { "bookingCode", newBookingCode },
-                    { "errCode", 0 },
-                    { "errMessage", $"Mã booking mới {newBookingCode} được tạo thành công" }
-                };
+                    var newBookingCode = await CreateNewBookingCode(request.bookingId!);
+                    string logTitle = "Tạo mã booking";
+                    string logBody = $"Mã booking {newBookingCode} được tạo thành công";
 
-                var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+                    await CreateNewBookingLog(request.bookingId!, logTitle, logBody);
 
-                //Json convert
-                return Content(json, "application/json");
+                    Dictionary<string, dynamic> result = new()
+                    {
+                        { "bookingCode", newBookingCode },
+                        { "errCode", 0 },
+                        { "errMessage", $"Mã booking mới {newBookingCode} được tạo thành công" }
+                    };
+
+                    var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+
+                    //Json convert
+                    return Content(json, "application/json");
+                }
+                else
+                {
+                    Dictionary<string, dynamic> result = new()
+                    {
+                        { "errCode", 1 },
+                        { "errMessage", $"Mã booking mới không tạo được" }
+                    };
+
+                    var json = JsonConvert.SerializeObject(result, Formatting.Indented, new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.None });
+
+                    //Json convert
+                    return Content(json, "application/json");
+                }
             }
             catch (Exception ex)
             {
@@ -611,6 +675,7 @@ namespace DeliverBox_BE.Controllers
                         box.id = value.id;
                         box.nameBox = value.nameBox;
                         box.status = value.status;
+                        break;
                     }
                 }
             }
@@ -756,6 +821,44 @@ namespace DeliverBox_BE.Controllers
             }
 
             return isDeactivate;
+        }
+
+        private async Task<bool> DisableOldBookingCode(string oldBookingCode)
+        {
+            bool isDisable = false;
+
+            try
+            {
+                var newStatus = new Dictionary<string, dynamic>
+                {
+                    { "status", 0 },
+                };
+
+                var response = await firebaseClient
+                    .Child("BookingCode")
+                    .OrderBy("bcode")
+                    .EqualTo(oldBookingCode)
+                    .OnceAsync<Object>();
+
+                foreach (var item in response)
+                {
+                    dynamic value = item.Object;
+                    string bookingCodeId = (string)value.id;
+                    await firebaseClient
+                        .Child("BookingCode")
+                        .Child(bookingCodeId)
+                        .PatchAsync(newStatus);
+
+                    isDisable = true;
+                    break;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex);
+            }
+
+            return isDisable;
         }
 
         private async Task<string> CreateNewBookingCode(string bookingId)

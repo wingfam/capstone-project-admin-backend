@@ -2,7 +2,7 @@
 {
     public class NewBookingCodeRequest
     {
-        public string? BookingId { get; set; }
-        public string? OldBookingCode { get; set; }
+        public string? bookingId { get; set; }
+        public string? oldBookingCode { get; set; }
     }
 }
